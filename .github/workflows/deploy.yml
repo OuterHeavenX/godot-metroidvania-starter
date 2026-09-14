@@ -1,0 +1,138 @@
+name: Export and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Required by actions/deploy-pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.7.2
+  EXPORT_PRESET: Web
+
+jobs:
+  export:
+    name: Export web build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the project source is present
+        run: |
+          if [ ! -f project.godot ]; then
+            echo "::error::project.godot not found. The Godot project source has not been pushed to this repository yet — see the 'Adding the project source' section of README.md."
+            exit 1
+          fi
+
+      - name: Cache Godot editor and export templates
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot/bin
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_VERSION }}-web
+
+      - name: Install Godot ${{ env.GODOT_VERSION }}
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+
+          mkdir -p ~/godot/bin
+          curl -fsSL -o /tmp/godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d ~/godot/bin
+
+          # The .tpz carries every platform (~1.3 GB unpacked). Keep only the
+          # web templates so the cache stays small.
+          templates=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$templates"
+          curl -fsSL -o /tmp/templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -qj /tmp/templates.tpz 'templates/web*' 'templates/version.txt' -d "$templates"
+
+          rm -f /tmp/godot.zip /tmp/templates.tpz
+
+      - name: Put godot on PATH
+        run: |
+          set -euo pipefail
+          ln -sf "$HOME/godot/bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64" "$HOME/godot/bin/godot"
+          chmod +x "$HOME/godot/bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
+          echo "$HOME/godot/bin" >> "$GITHUB_PATH"
+
+      - name: Check GDScript parses
+        run: |
+          set -euo pipefail
+          status=0
+          while IFS= read -r -d '' script; do
+            if ! godot --headless --check-only --script "$script" >/dev/null 2>&1; then
+              echo "::error file=$script::GDScript parse error"
+              godot --headless --check-only --script "$script" 2>&1 | tail -20
+              status=1
+            fi
+          done < <(find src tests -name '*.gd' -print0 2>/dev/null)
+          exit $status
+
+      - name: Check the export preset exists
+        run: |
+          set -euo pipefail
+          if [ ! -f export_presets.cfg ]; then
+            echo "::error::export_presets.cfg is missing. Commit it — CI reads the '${EXPORT_PRESET}' preset from it to build the web export."
+            exit 1
+          fi
+          if ! grep -qx "name=\"${EXPORT_PRESET}\"" export_presets.cfg; then
+            echo "::error::No export preset named '${EXPORT_PRESET}'. Presets found:"
+            grep '^name=' export_presets.cfg || true
+            exit 1
+          fi
+
+      - name: Import resources
+        run: godot --headless --import .
+
+      - name: Export web build
+        run: |
+          set -euo pipefail
+          mkdir -p build/web
+          godot --headless --export-release "${EXPORT_PRESET}" build/web/index.html
+          # actions/deploy-pages does not run Jekyll, but this is harmless and
+          # keeps the output identical to a branch-served build.
+          touch build/web/.nojekyll
+
+      - name: Verify the build output
+        run: |
+          set -euo pipefail
+          for f in index.html index.js index.wasm index.pck; do
+            if [ ! -s "build/web/$f" ]; then
+              echo "::error::export produced no build/web/$f"
+              exit 1
+            fi
+          done
+          ls -la build/web
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: export
+    # Pull requests build but do not publish.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

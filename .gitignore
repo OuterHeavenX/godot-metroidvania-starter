@@ -5,7 +5,9 @@
 # Godot 3 leftovers, in case an old export is ever run here.
 .import/
 export.cfg
-export_presets.cfg
+
+# NOTE: export_presets.cfg is deliberately NOT ignored. The CI web export
+# reads the "Web" preset from it. Keep signing keys and passwords out of it.
 
 # Export output. docs/ is the published web build and IS tracked;
 # everything else an export writes goes here and is not.

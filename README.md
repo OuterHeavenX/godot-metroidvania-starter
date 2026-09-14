@@ -51,7 +51,8 @@ tests/
   pound_test.gd
   shot_test.gd
 
-docs/                    Published web build (GitHub Pages source)
+docs/                    Legacy committed build; removable once CI deploys
+.github/workflows/       Export and deploy to GitHub Pages
 ```
 
 ## Autoloads
@@ -74,31 +75,48 @@ controls in `src/ui/touch_controls.tscn` work on desktop too.
 Open the project folder in Godot 4.7 or later and press F5. The renderer is
 GL Compatibility, stretch mode `canvas_items` with `expand` aspect.
 
-## Publishing a web build
+## Continuous integration
 
-The web export preset writes into `docs/`, which GitHub Pages serves. Export
-with the filename `index.html` so the output matches the tracked filenames:
+`.github/workflows/deploy.yml` builds the web export on GitHub's runners and
+publishes it to Pages. Builds no longer need to be committed.
 
-```
-docs/index.html
-docs/index.js
-docs/index.wasm
-docs/index.pck
-docs/index.png            splash
-docs/index.icon.png
-docs/index.apple-touch-icon.png
-docs/index.audio.worklet.js
-docs/index.audio.position.worklet.js
-docs/.nojekyll            keeps Pages from running Jekyll over the build
-```
+| Trigger              | What runs                          |
+| -------------------- | ---------------------------------- |
+| Push to `main`       | Export, then deploy to Pages       |
+| Pull request         | Export only — verifies, publishes nothing |
+| Manual (Actions tab) | Export, then deploy                |
 
-Commit the whole `docs/` folder — Pages serves it directly, there is no build
-step on GitHub's side.
+The export job:
+
+1. Installs Godot 4.7.2 and the web export templates, cached between runs.
+2. Parses every `.gd` file under `src/` and `tests/` with `--check-only`,
+   failing on a syntax error.
+3. Checks `export_presets.cfg` contains a preset named `Web`.
+4. Runs `godot --headless --import .` then
+   `godot --headless --export-release Web build/web/index.html`.
+5. Verifies `index.html`, `index.js`, `index.wasm` and `index.pck` are non-empty
+   before uploading.
+
+To move to a newer engine, change `GODOT_VERSION` at the top of the workflow.
+The preset name is `EXPORT_PRESET` in the same block.
+
+### export_presets.cfg must be committed
+
+CI reads the `Web` preset from it. It is deliberately not gitignored — keep
+signing keys and passwords out of it.
 
 ### Pages configuration
 
-Settings → Pages → Build and deployment → Source: *Deploy from a branch*,
-Branch: `main`, Folder: **`/docs`**.
+Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+
+Once the first Actions deploy succeeds, the tracked `docs/` folder is no longer
+serving anything and can be deleted — CI rebuilds the game from source on every
+push to `main`.
+
+## Exporting locally
+
+Open the project in Godot 4.7 or later and export the `Web` preset to any path.
+There is no need to commit the result.
 
 ## Adding the project source
 
@@ -107,6 +125,7 @@ copy these from your local project folder into the repo root and commit:
 
 ```
 project.godot
+export_presets.cfg       needed by CI to build the Web export
 icon.svg
 icon.svg.import
 src/
@@ -116,3 +135,6 @@ tests/
 
 Do not copy `.godot/` — it is editor cache, it is gitignored, and Godot
 regenerates it the first time the project is opened.
+
+Once that lands on `main`, the Actions workflow takes over building and
+publishing the game.
