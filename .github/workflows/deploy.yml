@@ -84,20 +84,6 @@ jobs:
           chmod +x "$HOME/godot/bin/Godot_v${GODOT_VERSION}-stable_linux.x86_64"
           echo "$HOME/godot/bin" >> "$GITHUB_PATH"
 
-      - name: Check GDScript parses
-        if: steps.detect.outputs.has_source == 'true'
-        run: |
-          set -euo pipefail
-          status=0
-          while IFS= read -r -d '' script; do
-            if ! godot --headless --check-only --script "$script" >/dev/null 2>&1; then
-              echo "::error file=$script::GDScript parse error"
-              godot --headless --check-only --script "$script" 2>&1 | tail -20
-              status=1
-            fi
-          done < <(find src tests -name '*.gd' -print0 2>/dev/null)
-          exit $status
-
       - name: Check the export preset exists
         if: steps.detect.outputs.has_source == 'true'
         run: |
@@ -115,6 +101,17 @@ jobs:
       - name: Import resources
         if: steps.detect.outputs.has_source == 'true'
         run: godot --headless --import .
+
+      - name: Check every script compiles
+        if: steps.detect.outputs.has_source == 'true'
+        # godot --export-release exits 0 on a broken script, and
+        # --check-only --script cannot resolve autoload references, so neither
+        # works as a gate. This loads every script inside the running project.
+        run: |
+          set -euo pipefail
+          out=$(timeout 300 godot --headless --scene res://tests/runners/check_scripts.tscn 2>&1) || true
+          echo "$out" | grep -E 'SCRIPT (ERROR|CHECK)|Parse Error' || true
+          echo "$out" | grep -q 'SCRIPT CHECK OK'
 
       - name: Run the game's test suites
         if: steps.detect.outputs.has_source == 'true'
