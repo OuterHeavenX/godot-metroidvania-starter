@@ -28,7 +28,7 @@ jobs:
     outputs:
       has_source: ${{ steps.detect.outputs.has_source }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Nothing to build is not a failure. Skip cleanly when the project source
       # has not been pushed yet, but fail loudly if a project is half-present —
@@ -50,7 +50,7 @@ jobs:
       - name: Cache Godot editor and export templates
         if: steps.detect.outputs.has_source == 'true'
         id: godot-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/godot/bin
@@ -122,9 +122,6 @@ jobs:
           set -euo pipefail
           mkdir -p build/web
           godot --headless --export-release "${EXPORT_PRESET}" build/web/index.html
-          # actions/deploy-pages does not run Jekyll, but this is harmless and
-          # keeps the output identical to a branch-served build.
-          touch build/web/.nojekyll
 
       - name: Verify the build output
         if: steps.detect.outputs.has_source == 'true'
@@ -140,7 +137,7 @@ jobs:
 
       - name: Upload Pages artifact
         if: steps.detect.outputs.has_source == 'true'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/web
 
@@ -159,4 +156,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
