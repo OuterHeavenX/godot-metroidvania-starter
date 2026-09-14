@@ -1,0 +1,16 @@
+# Normalize line endings for text sources.
+*.gd        text eol=lf
+*.tscn      text eol=lf
+*.tres      text eol=lf
+*.import    text eol=lf
+*.cfg       text eol=lf
+*.md        text eol=lf
+project.godot text eol=lf
+
+# Export artifacts and binary assets: never diff or merge these.
+*.wasm      binary
+*.pck       binary
+*.png       binary
+*.wav       binary
+*.ogg       binary
+docs/index.js binary
