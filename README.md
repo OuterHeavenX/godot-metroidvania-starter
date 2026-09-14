@@ -10,6 +10,8 @@ Play it: https://outerheavenx.github.io/godot-metroidvania-starter/
 ```
 project.godot            Project settings, input map, autoloads
 icon.svg
+index.html               Redirect to docs/, only used if Pages serves the root
+.nojekyll                Serve files verbatim if Pages serves the root
 
 src/                     All game code, one folder per feature
   audio/
@@ -134,6 +136,13 @@ build will not boot there.
 
 Settings → Pages → Build and deployment → Source: **Deploy from a branch**,
 Branch: **`main`**, Folder: **`/docs`**.
+
+The folder matters. With Folder set to **`/ (root)`** there is no `index.html`
+at the top of the repo, so Jekyll renders `README.md` and you get this page
+instead of the game. As a safety net the root carries a small `index.html`
+that forwards to `docs/`, plus a `.nojekyll` so Pages serves files verbatim —
+so the published URL works under either setting. With Folder set to `/docs`
+neither of those root files is served at all.
 
 ### Updating the published game
 
