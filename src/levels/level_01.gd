@@ -24,13 +24,30 @@ const PLATFORMS: Array = [
 	Rect2(3240, 0, 280, 160),
 	Rect2(2820, -120, 100, 32),
 	Rect2(3080, 160, 40, 160),
-	Rect2(3240, 160, 40, 160),
+	Rect2(3240, 160, 40, 70),
 	Rect2(3080, 320, 200, 40),
+
+	# --- The Undercroft: opened up by pounding the cracked span above ---
+	Rect2(3280, 320, 420, 40),
+	Rect2(3520, 140, 180, 20),
+	Rect2(3900, 320, 660, 40),
+	Rect2(4150, -40, 70, 360),
+	Rect2(4420, -40, 70, 360),
+	Rect2(4620, -100, 220, 30),
+	Rect2(4980, -220, 130, 26),
+	Rect2(5240, -340, 130, 26),
+	Rect2(5500, -460, 130, 26),
+	Rect2(5630, -460, 420, 160),
+	Rect2(6150, -460, 300, 160),
+	Rect2(6010, -300, 40, 160),
+	Rect2(6150, -300, 40, 160),
+	Rect2(6010, -140, 180, 40),
 ]
 
 
 const CRACKED: Array = [
 	Rect2(3112, -30, 136, 30),
+	Rect2(6050, -490, 100, 30),
 ]
 
 const ENEMIES: Array = [
@@ -38,12 +55,24 @@ const ENEMIES: Array = [
 	[Vector2(2950, -60), "spearman"],
 	[Vector2(3250, -60), "archer"],
 	[Vector2(3150, 260), "warrior"],
+
+	# --- The Undercroft ---
+	[Vector2(3520, 260), "warrior"],
+	[Vector2(4000, 260), "spearman"],
+	[Vector2(4320, 260), "warrior"],
+	[Vector2(4760, -160), "archer"],
+	[Vector2(5800, -520), "warrior"],
+	[Vector2(5960, -520), "spearman"],
+	[Vector2(6300, -520), "archer"],
 ]
-const CHECKPOINTS: Array = [Vector2(1780, -60), Vector2(2440, -360), Vector2(2900, -60)]
+const CHECKPOINTS: Array = [
+	Vector2(1780, -60), Vector2(2440, -360), Vector2(2900, -60),
+	Vector2(3380, 260), Vector2(3960, 260), Vector2(4660, -160), Vector2(5700, -520),
+]
 const ORB_POS := Vector2(2510, -380)
 const POUND_ORB_POS := Vector2(2870, -180)
 const POUND_ORB_TINT := Color("ff9a3c")
-const GOAL_POS := Vector2(3180, 260)
+const GOAL_POS := Vector2(6100, -200)
 const KILL_Y := 500.0
 
 var player: MVPlayer
@@ -60,7 +89,7 @@ func _ready() -> void:
 	hud = $HUD
 	var cam: Camera2D = player.get_node("Camera2D")
 	cam.limit_left = -40
-	cam.limit_right = 3560
+	cam.limit_right = 6520
 	cam.limit_top = -760
 	cam.limit_bottom = 420
 	player.health_changed.connect(hud.set_hearts)
@@ -197,6 +226,10 @@ func _build_hints() -> void:
 
 	_make_hint("GROUND POUND:\npress S / ↓ in midair", Vector2(2640, -240))
 	_make_hint("CRACKED STONE:\npound it to smash\nthrough", Vector2(2960, -190))
+
+	_make_hint("THE UNDERCROFT", Vector2(3300, 196))
+	_make_hint("WALL JUMP the shaft\nto climb out", Vector2(3900, 60))
+	_make_hint("One more cracked span\nstands between you\nand the way out", Vector2(5660, -600))
 
 
 func _spawn_actors() -> void:

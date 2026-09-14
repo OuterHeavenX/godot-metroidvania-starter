@@ -49,7 +49,10 @@ tests/
   hero_test.gd           Movement and ability checks
   polish_test.gd
   pound_test.gd
-  shot_test.gd
+  skeleton_test.gd
+  undercroft_test.gd     Drives the new region's jumps against real collision
+  script_check.gd        Loads every script so a syntax error fails the build
+  runners/               Scenes CI launches with --scene
 
 docs/                    Committed web build (fallback while Pages moves to Actions)
 tools/recover/           Scripts that rebuilt this source from the exported build
@@ -123,6 +126,33 @@ push to `main`.
 
 Open the project in Godot 4.7 or later and export the `Web` preset to any path.
 There is no need to commit the result.
+
+## Level layout
+
+`src/levels/level_01.gd` builds the whole stage from const arrays — `PLATFORMS`,
+`CRACKED`, `ENEMIES`, `CHECKPOINTS` and the orb/goal positions — so new content
+is data, not new scenes.
+
+The run goes: opening ground, the wall-jump shaft, the double-jump orb, the
+gated chamber, the ground-pound orb, and then the cracked span that drops you
+into **the Undercroft** — a second half gated behind ground pound, running east
+from the vault basement through a tunnel, a pit jump, a wall-jump chimney, a
+climb over floating ledges, and a final cracked span above the goal vault.
+
+`tools/recover/jumpsim.py` simulates the player's exact `_physics_process` arc.
+Use it before placing a ledge: it reports how far a platform can sit for a
+given rise, which is what the numbers below mean.
+
+| rise | single jump | double jump | double + dash |
+| ---- | ----------- | ----------- | ------------- |
+| 0px | 286px | 481px | 546px |
+| 120px | 221px | 442px | 503px |
+| 240px | out of reach | 386px | 429px |
+| 295px | out of reach | 321px | out of reach |
+
+A single jump peaks at 157px, a double at 298px. Every hop in the Undercroft
+sits at or under 70% of the available reach, and `tests/undercroft_test.gd`
+re-checks each one against real collision rather than trusting the arithmetic.
 
 ## Provenance of this source
 

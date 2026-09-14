@@ -34,7 +34,9 @@ func _physics_process(_d: float) -> void:
 		saw_arrow = true
 	if phase == 0 and frames > 90:
 		skels = get_tree().get_nodes_in_group("enemy")
-		check(skels.size() == 4, "4 skeletons spawned (got %d)" % skels.size())
+		# Counts are level content, not behaviour: assert every kind is present
+		# and well-formed so new encounters can be added without editing this.
+		check(skels.size() >= 4, "skeletons spawned (%d)" % skels.size())
 		var kinds: Array = []
 		for s in skels:
 			kinds.append(s.kind)
@@ -42,9 +44,15 @@ func _physics_process(_d: float) -> void:
 				warrior = s
 			if s.kind == "archer":
 				archer = s
-		check(kinds.count("warrior") == 2, "2 warriors")
-		check(kinds.count("spearman") == 1, "1 spearman")
-		check(kinds.count("archer") == 1, "1 archer")
+		check(kinds.count("warrior") >= 1, "warriors present (%d)" % kinds.count("warrior"))
+		check(kinds.count("spearman") >= 1, "spearmen present (%d)" % kinds.count("spearman"))
+		check(kinds.count("archer") >= 1, "archers present (%d)" % kinds.count("archer"))
+		var known := ["warrior", "spearman", "archer"]
+		var unknown: Array = []
+		for k in kinds:
+			if not known.has(k):
+				unknown.append(k)
+		check(unknown.is_empty(), "every skeleton has a known kind, got %s" % str(unknown))
 		for s in skels:
 			var spr: AnimatedSprite2D = s.get_node("Visual/Sprite")
 			var fr: SpriteFrames = spr.sprite_frames

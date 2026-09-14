@@ -6,6 +6,8 @@ var player: Node = null
 var victim: Node = null
 var failures: Array[String] = []
 var _pound_armed := false
+var _slab_count := 0
+var _target_slab: Node = null
 var _pound_ok := false
 var _crush_armed := false
 var _crush_ok := false
@@ -53,8 +55,14 @@ func _physics_process(_delta: float) -> void:
 		player = get_tree().get_nodes_in_group("player")[0]
 		check(player != null, "player found")
 		check(not bool(player.get("has_ground_pound")), "pound locked before orb")
-		check(get_tree().get_nodes_in_group("cracked").size() == 1,
-			"one cracked slab in the level")
+		# Track the slab this test actually pounds rather than the level-wide
+		# count, so adding cracked stone elsewhere does not break the test.
+		_slab_count = get_tree().get_nodes_in_group("cracked").size()
+		check(_slab_count >= 1, "level has cracked stone (%d slabs)" % _slab_count)
+		for c in get_tree().get_nodes_in_group("cracked"):
+			if absf((c as Node2D).global_position.x - 3180.0) < 120.0:
+				_target_slab = c
+		check(_target_slab != null, "found the slab above the vault")
 		drop(Vector2(3180, -200))
 		press_action("pound")
 	if frame == 8:
@@ -72,8 +80,9 @@ func _physics_process(_delta: float) -> void:
 	if frame == 24:
 		check(_pound_ok, "pound starts midair")
 	if frame == 40:
-		check(get_tree().get_nodes_in_group("cracked").size() == 0,
-			"slab smashed by the pound")
+		check(not is_instance_valid(_target_slab), "slab smashed by the pound")
+		check(get_tree().get_nodes_in_group("cracked").size() == _slab_count - 1,
+			"only the pounded slab was destroyed")
 	if player.global_position.y > 200.0:
 		_chamber_ok = true
 	if frame == 95:
