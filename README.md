@@ -86,6 +86,11 @@ publishes it to Pages. Builds no longer need to be committed.
 | Pull request         | Export only — verifies, publishes nothing |
 | Manual (Actions tab) | Export, then deploy                |
 
+Until the project source is pushed there is nothing to export, so the workflow
+reports a skip and passes rather than failing. The deploy step is skipped in
+that case too — publishing an empty artifact would blank the live site. A repo
+containing `src/` but no `project.godot` is treated as an error, not a skip.
+
 The export job:
 
 1. Installs Godot 4.7.2 and the web export templates, cached between runs.
