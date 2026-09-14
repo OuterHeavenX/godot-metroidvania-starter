@@ -54,7 +54,7 @@ tests/
   script_check.gd        Loads every script so a syntax error fails the build
   runners/               Scenes CI launches with --scene
 
-docs/                    Committed web build (fallback while Pages moves to Actions)
+docs/                    Committed web build — this is the live site
 tools/recover/           Scripts that rebuilt this source from the exported build
 .github/workflows/       Export and deploy to GitHub Pages
 ```
@@ -81,30 +81,31 @@ GL Compatibility, stretch mode `canvas_items` with `expand` aspect.
 
 ## Continuous integration
 
-`.github/workflows/deploy.yml` builds the web export on GitHub's runners and
-publishes it to Pages. Builds no longer need to be committed.
+`.github/workflows/build.yml` builds and checks the project on GitHub's
+runners. It does **not** publish: Pages serves the committed `docs/` folder
+straight off the branch, so the build in `docs/` is the live site.
 
-| Trigger              | What runs                          |
-| -------------------- | ---------------------------------- |
-| Push to `main`       | Export, then deploy to Pages       |
-| Pull request         | Export only — verifies, publishes nothing |
-| Manual (Actions tab) | Export, then deploy                |
+| Trigger              | What runs                    |
+| -------------------- | ---------------------------- |
+| Push to `main`       | Build and verify             |
+| Pull request         | Build and verify             |
+| Manual (Actions tab) | Build and verify             |
 
 Until the project source is pushed there is nothing to export, so the workflow
-reports a skip and passes rather than failing. The deploy step is skipped in
-that case too — publishing an empty artifact would blank the live site. A repo
-containing `src/` but no `project.godot` is treated as an error, not a skip.
+reports a skip and passes rather than failing. A repo containing `src/` but no
+`project.godot` is treated as an error, not a skip.
 
-The export job:
+The job:
 
 1. Installs Godot 4.7.2 and the web export templates, cached between runs.
-2. Parses every `.gd` file under `src/` and `tests/` with `--check-only`,
-   failing on a syntax error.
-3. Checks `export_presets.cfg` contains a preset named `Web`.
-4. Runs `godot --headless --import .` then
-   `godot --headless --export-release Web build/web/index.html`.
-5. Verifies `index.html`, `index.js`, `index.wasm` and `index.pck` are non-empty
-   before uploading.
+2. Loads every script inside the running project, so a syntax error fails the
+   build. This needs doing properly: `godot --export-release` exits 0 on a
+   broken script, and `--check-only --script` cannot resolve `class_name` or
+   autoload references file-by-file.
+3. Runs every suite in `tests/runners/`.
+4. Exports the `Web` preset and checks the output is non-empty.
+5. Checks `docs/` matches that fresh export, so the published game can never
+   silently lag the source.
 
 To move to a newer engine, change `GODOT_VERSION` at the top of the workflow.
 The preset name is `EXPORT_PRESET` in the same block.
@@ -114,18 +115,39 @@ The preset name is `EXPORT_PRESET` in the same block.
 CI reads the `Web` preset from it. It is deliberately not gitignored — keep
 signing keys and passwords out of it.
 
+The preset sets `exclude_filter="docs/*,tests/*"`, and `docs/.gdignore` keeps
+Godot's importer out of the build folder entirely. Both matter:
+
+- The build output lives inside the project. Without excluding it, Godot
+  imports the previous build's own icons and packs them into the next build,
+  so the export depends on its own prior output instead of only on the source.
+- Test runner scenes re-resolve their references on each import, which made the
+  `.pck` differ between two clean builds of identical source. Players do not
+  need the tests anyway, and dropping them makes the export byte-reproducible —
+  which is what lets CI compare `docs/` against a fresh build.
+
+It also sets `variant/thread_support=false`. A threaded web build needs
+cross-origin isolation headers, which GitHub Pages cannot send, so a threaded
+build will not boot there.
+
 ### Pages configuration
 
-Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+Settings → Pages → Build and deployment → Source: **Deploy from a branch**,
+Branch: **`main`**, Folder: **`/docs`**.
 
-Once the first Actions deploy succeeds, the tracked `docs/` folder is no longer
-serving anything and can be deleted — CI rebuilds the game from source on every
-push to `main`.
+### Updating the published game
 
-## Exporting locally
+`docs/` is the live site, so a source change is not published until the build
+is rebuilt and committed. CI fails if they drift apart.
 
-Open the project in Godot 4.7 or later and export the `Web` preset to any path.
-There is no need to commit the result.
+```
+godot --headless --import .
+godot --headless --export-release Web build/web/index.html
+cp build/web/* docs/
+```
+
+The export is byte-reproducible, so rebuilding with no source change produces
+no diff.
 
 ## Level layout
 

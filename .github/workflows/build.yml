@@ -1,4 +1,4 @@
-name: Export and deploy
+name: Build and verify
 
 on:
   push:
@@ -6,24 +6,22 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Required by actions/deploy-pages.
+# Pages serves the committed docs/ folder straight off the branch, so nothing
+# here publishes. CI only has to prove the build is sound and docs/ is current.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# Let a running deploy finish rather than cancelling it half-published.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   GODOT_VERSION: 4.7.2
   EXPORT_PRESET: Web
 
 jobs:
-  export:
-    name: Export web build
+  build:
+    name: Build and verify
     runs-on: ubuntu-latest
     outputs:
       has_source: ${{ steps.detect.outputs.has_source }}
@@ -155,25 +153,29 @@ jobs:
           done
           ls -la build/web
 
-      - name: Upload Pages artifact
+      - name: Check docs/ matches the source
         if: steps.detect.outputs.has_source == 'true'
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: build/web
-
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: export
-    # Pull requests build but do not publish. Skipping when nothing was
-    # exported matters: deploying an empty artifact would blank the live site.
-    if: >-
-      needs.export.outputs.has_source == 'true'
-      && github.ref == 'refs/heads/main'
-      && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v5
+        # Pages serves docs/ off the branch, so a stale docs/ means the live
+        # game silently lags the code. The export is byte-reproducible, so a
+        # fresh build can be compared against what is committed.
+        run: |
+          set -euo pipefail
+          stale=0
+          for f in build/web/*; do
+            name=$(basename "$f")
+            if [ ! -f "docs/$name" ]; then
+              echo "::error::docs/$name is missing from the committed build"
+              stale=1
+            elif ! cmp -s "$f" "docs/$name"; then
+              echo "::error::docs/$name does not match a fresh export"
+              stale=1
+            fi
+          done
+          if [ "$stale" -ne 0 ]; then
+            echo "::error::The committed build in docs/ is out of date. Rebuild it with:"
+            echo "  godot --headless --import ."
+            echo "  godot --headless --export-release Web build/web/index.html"
+            echo "  cp build/web/* docs/"
+            exit 1
+          fi
+          echo "docs/ matches the source"
