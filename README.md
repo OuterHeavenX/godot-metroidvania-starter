@@ -51,7 +51,8 @@ tests/
   pound_test.gd
   shot_test.gd
 
-docs/                    Legacy committed build; removable once CI deploys
+docs/                    Committed web build (fallback while Pages moves to Actions)
+tools/recover/           Scripts that rebuilt this source from the exported build
 .github/workflows/       Export and deploy to GitHub Pages
 ```
 
@@ -123,23 +124,24 @@ push to `main`.
 Open the project in Godot 4.7 or later and export the `Web` preset to any path.
 There is no need to commit the result.
 
-## Adding the project source
+## Provenance of this source
 
-Only the web build has been committed so far. To add the Godot project itself,
-copy these from your local project folder into the repo root and commit:
+The repository previously contained only the exported web build. The source
+here was reconstructed from `docs/index.pck` with the scripts in
+`tools/recover/`, and verified three ways:
 
-```
-project.godot
-export_presets.cfg       needed by CI to build the Web export
-icon.svg
-icon.svg.import
-src/
-assets/
-tests/
-```
+1. Every `.gd` recompiles to a **token stream identical** to the `.gdc` in the
+   shipped pack, so the code is semantically the original.
+2. The rebuilt project exports an `index.js`, `index.wasm` and both audio
+   worklets that are **byte-identical** to the published build.
+3. The game's own four test suites pass (81 assertions).
 
-Do not copy `.godot/` — it is editor cache, it is gitignored, and Godot
-regenerates it the first time the project is opened.
+What did not survive: **comments and original formatting**, which the exported
+token stream does not carry. If you still have the original project, prefer it
+over this reconstruction and treat this as a fallback.
 
-Once that lands on `main`, the Actions workflow takes over building and
-publishing the game.
+Audio is stored as `assets/audio/*.res` rather than `.wav`. The exported pack
+only contained Godot's QOA-compressed streams; saving them as resources keeps
+them bit-exact, where decoding back to WAV would have altered them. Dropping
+the original `.wav` files in and pointing `AUDIO_DIR` back at them is a safe
+swap if you have them.

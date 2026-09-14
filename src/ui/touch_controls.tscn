@@ -1,0 +1,76 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/ui/touch_controls.gd" id="1_xoax1"]
+[ext_resource type="Script" path="res://src/ui/float_joystick.gd" id="2_2dsh2"]
+
+[node name="TouchControls" type="CanvasLayer" unique_id=1023993535]
+layer = 10
+script = ExtResource("1_xoax1")
+
+[node name="Joystick" type="Control" parent="." unique_id=1081453776]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("2_2dsh2")
+
+[node name="Attack" type="Button" parent="." unique_id=1268791564]
+modulate = Color(1, 1, 1, 0.55)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -430.0
+offset_top = -150.0
+offset_right = -320.0
+offset_bottom = -40.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "ATTACK"
+
+[node name="Dash" type="Button" parent="." unique_id=1390519405]
+modulate = Color(1, 1, 1, 0.55)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -292.0
+offset_top = -150.0
+offset_right = -182.0
+offset_bottom = -40.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "DASH"
+
+[node name="Jump" type="Button" parent="." unique_id=411835927]
+modulate = Color(1, 1, 1, 0.55)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -154.0
+offset_top = -174.0
+offset_right = -30.0
+offset_bottom = -50.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "JUMP"
+
+[node name="Pound" type="Button" parent="." unique_id=789734694]
+modulate = Color(1, 1, 1, 0.55)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -292.0
+offset_top = -282.0
+offset_right = -182.0
+offset_bottom = -172.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+text = "POUND"
