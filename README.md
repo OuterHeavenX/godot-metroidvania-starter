@@ -158,6 +158,27 @@ cp build/web/* docs/
 The export is byte-reproducible, so rebuilding with no source change produces
 no diff.
 
+## Camera framing
+
+The camera lives on the player (`src/player/player.tscn`) at `zoom = 1.4`, with
+position smoothing and a horizontal drag margin already set.
+
+Stretch is `canvas_items` with aspect `expand` and no explicit viewport size, so
+the base is Godot's default 1152x648. On anything 16:9 or wider the height stays
+648 canvas units and the width grows with the aspect; on narrower windows the
+width holds at 1152 and the height grows. So at zoom 1.4:
+
+- vertical view is 463 world px, putting the 44px character at ~9.5% of screen
+  height, which is the usual range for a 2D platformer;
+- horizontal view is at least 823 world px, so half-width is at least 411px.
+
+That half-width is the constraint on enemy reach. An archer's `shoot_range`
+must stay inside it or arrows arrive from off screen — with the camera's drag
+margin letting the player sit off-centre, the usable budget is about 350px,
+which is why `shoot_range` is 340. **Raising the zoom means lowering that
+range.** `tools/recover/jumpsim.py` has nothing to say here; the numbers above
+are just viewport arithmetic, but they are easy to get wrong by eye.
+
 ## Level layout
 
 `src/levels/level_01.gd` builds the whole stage from const arrays — `PLATFORMS`,
