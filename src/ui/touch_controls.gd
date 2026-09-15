@@ -2,6 +2,7 @@ extends CanvasLayer
 
 
 func _ready() -> void:
+	add_to_group("touch_controls")
 	visible = DisplayServer.is_touchscreen_available()
 	_bind($Attack, "attack")
 	_bind($Dash, "dash")

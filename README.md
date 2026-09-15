@@ -30,7 +30,8 @@ src/                     All game code, one folder per feature
     level_01.gd          Main scene
     level_01.tscn
   pickups/
-    orb.gd / orb.tscn
+    orb.gd / orb.tscn     Ability orbs
+    heart.gd              Health pickup, script-built like cracked_floor
   checkpoint/
     checkpoint.gd / checkpoint.tscn
   goal/
@@ -52,6 +53,8 @@ tests/
   polish_test.gd
   pound_test.gd
   skeleton_test.gd
+  health_test.gd         Hearts, checkpoint healing, full-health refusal
+  pause_test.gd          Pause, resume and restart (survives the scene reload)
   undercroft_test.gd     Drives the new region's jumps against real collision
   script_check.gd        Loads every script so a syntax error fails the build
   runners/               Scenes CI launches with --scene
@@ -172,12 +175,37 @@ width holds at 1152 and the height grows. So at zoom 1.4:
   height, which is the usual range for a 2D platformer;
 - horizontal view is at least 823 world px, so half-width is at least 411px.
 
+The camera also leads by `CAM_LOOKAHEAD` (60px) in the facing direction. That
+is not only feel: the drag margin makes the camera *trail* the player by about
+62px, showing where you have been rather than where you are going. Leading by
+roughly the same distance re-centres the view, which widens the worst-case
+sightline from 349px to about 409px — so the lookahead buys headroom for enemy
+reach rather than spending it.
+
 That half-width is the constraint on enemy reach. An archer's `shoot_range`
 must stay inside it or arrows arrive from off screen — with the camera's drag
 margin letting the player sit off-centre, the usable budget is about 350px,
 which is why `shoot_range` is 340. **Raising the zoom means lowering that
 range.** `tools/recover/jumpsim.py` has nothing to say here; the numbers above
 are just viewport arithmetic, but they are easy to get wrong by eye.
+
+## Health, pause and restart
+
+Health only ever went down: `respawn()` restored it, so dying was the only way
+to heal. Over a level this long that does not hold up, so:
+
+- reaching a **checkpoint** restores health as well as setting the spawn point;
+- **hearts** (`HEARTS` in the level) restore one point each, and refuse to be
+  picked up at full health so they stay on the ground until they are worth
+  taking.
+
+`Esc` or the PAUSE button pauses the run; reaching the goal pauses it too and
+offers PLAY AGAIN. Both panels live on a child `CanvasLayer` at layer 20
+because the on-screen touch controls sit at layer 10 and would otherwise render
+over them, and the touch controls are hidden while a panel is up rather than
+left tappable underneath. The HUD runs with `process_mode = ALWAYS` so its
+buttons still work while the tree is paused — and so do the test runners, which
+would otherwise freeze the moment a test reaches the goal.
 
 ## Level layout
 

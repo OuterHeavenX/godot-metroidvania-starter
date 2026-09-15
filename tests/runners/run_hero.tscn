@@ -8,4 +8,5 @@
 [node name="Level" parent="." instance=ExtResource("1_lvl")]
 
 [node name="Test" type="Node" parent="."]
+process_mode = 3
 script = ExtResource("2_test")

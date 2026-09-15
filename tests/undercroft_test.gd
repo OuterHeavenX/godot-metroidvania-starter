@@ -28,6 +28,7 @@ var climb_dir := 1.0
 var climb_cd := 0
 var climb_best := 0.0
 var wall_jumps := 0
+var walk_best := 0.0
 
 
 func check(cond: bool, label: String) -> void:
@@ -75,7 +76,21 @@ func _physics_process(_delta: float) -> void:
 			act("move_right", false)
 			check(doorway_x > 3480.0,
 				"walked through the basement doorway (reached x=%.0f)" % doorway_x)
-			# Drop into the chimney and climb it by wall jumping.
+			# Walk the route rather than teleporting into the shaft: a
+			# full-height pillar here would wall the chimney off, and hopping
+			# between teleported waypoints would not notice.
+			place(Vector2(3990, 298))
+			act("move_right", true)
+			phase = 150
+			t = 0
+		return
+
+	if phase == 150:
+		if player.is_on_floor():
+			walk_best = maxf(walk_best, player.global_position.x)
+		if t > 200:
+			check(walk_best > 4260.0,
+				"walked from the landing into the chimney shaft (reached x=%.0f)" % walk_best)
 			place(Vector2(4300, 298))
 			climb_best = 298.0
 			climb_dir = 1.0
@@ -176,7 +191,13 @@ func _physics_process(_delta: float) -> void:
 				check(slab_found and not is_instance_valid(slab),
 					"pounded through the span into the vault")
 				var p: Vector2 = player.global_position
-				check(p.y > -260.0, "player dropped into the vault (x=%.0f y=%.0f)" % [p.x, p.y])
+				# The goal's trigger reaches up the flag to about y-330, so
+				# winning now catches the player mid-drop rather than on the
+				# vault floor, and pauses the run there.
+				check(p.y > -420.0, "dropped through the span (x=%.0f y=%.0f)" % [p.x, p.y])
+				var hud := get_tree().get_first_node_in_group("hud")
+				check(hud != null and bool(hud.get("won")), "reaching the goal won the run")
+				check(get_tree().paused, "winning pauses the run")
 				_finish()
 		return
 

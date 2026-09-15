@@ -5,6 +5,7 @@ var activated := false
 
 
 func _ready() -> void:
+	add_to_group("checkpoint")
 	collision_layer = 0
 	collision_mask = 1
 	body_entered.connect(_on_body)
@@ -17,7 +18,13 @@ func _on_body(body: Node2D) -> void:
 	if p != null:
 		activated = true
 		p.set_checkpoint(global_position + Vector2(0, -10))
+		# Dying was the only way to recover health, which does not hold up over
+		# a level this long. Reaching a new checkpoint restores it.
+		var healed: bool = p.heal(p.MAX_HP)
 		AudioMan.play("checkpoint")
+		if healed:
+			JuiceMan.burst(p.global_position, Color(0.95, 0.35, 0.45),
+				14, 170.0, 0.5, 220.0, 4.0)
 		JuiceMan.burst(global_position + Vector2(0, -48), Color(0.95, 0.75, 0.3),
 			12, 200.0, 0.5, 300.0, 4.0)
 		queue_redraw()

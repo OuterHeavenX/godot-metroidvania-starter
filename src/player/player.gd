@@ -35,6 +35,11 @@ const APEX_GRAVITY_MULT := 0.72
 const MAX_FALL_SPEED := 1150.0
 const ATTACK_BACK_GRACE := 14.0
 const DASH_IFRAMES := true
+# The camera's drag margin makes it trail the player, which shows where you
+# have been rather than where you are going. Leading by roughly the same
+# distance re-centres the view in the direction of travel.
+const CAM_LOOKAHEAD := 60.0
+const CAM_LOOKAHEAD_RATE := 4.0
 
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity", 980.0)
 var hp := MAX_HP
@@ -60,6 +65,7 @@ var _fall_v := 0.0
 var spawn_point := Vector2.ZERO
 
 @onready var visual: Node2D = $Visual
+@onready var camera: Camera2D = $Camera2D
 
 
 func _ready() -> void:
@@ -203,6 +209,11 @@ func _physics_process(delta: float) -> void:
 				buffer = 0.0
 				AudioMan.play("double_jump" if has_double_jump else "jump")
 
+	if camera != null:
+		var want: float = facing * CAM_LOOKAHEAD
+		var k: float = 1.0 - exp(-CAM_LOOKAHEAD_RATE * delta)
+		camera.offset.x = lerpf(camera.offset.x, want, k)
+
 	_was_floor = is_on_floor()
 	_fall_v = velocity.y
 	move_and_slide()
@@ -252,6 +263,16 @@ func _pound_impact() -> void:
 
 func set_checkpoint(pos: Vector2) -> void:
 	spawn_point = pos
+
+
+## Restores health. Returns false when nothing was healed, so a pickup can
+## leave itself on the ground instead of being spent at full health.
+func heal(amount: int) -> bool:
+	if dead or amount <= 0 or hp >= MAX_HP:
+		return false
+	hp = mini(hp + amount, MAX_HP)
+	health_changed.emit(hp, MAX_HP)
+	return true
 
 
 func take_damage(amount: int, from_pos: Vector2) -> void:

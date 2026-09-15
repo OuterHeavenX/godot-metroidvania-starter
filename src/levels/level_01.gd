@@ -6,6 +6,7 @@ const OrbScene := preload("res://src/pickups/orb.tscn")
 const CheckpointScene := preload("res://src/checkpoint/checkpoint.tscn")
 const GoalScene := preload("res://src/goal/goal.tscn")
 const CrackedFloorScript := preload("res://src/world/cracked_floor.gd")
+const HeartScript := preload("res://src/pickups/heart.gd")
 
 
 const PLATFORMS: Array = [
@@ -30,8 +31,11 @@ const PLATFORMS: Array = [
 	# --- The Undercroft: opened up by pounding the cracked span above ---
 	Rect2(3280, 320, 420, 40),
 	Rect2(3520, 140, 180, 20),
-	Rect2(3900, 320, 660, 40),
-	Rect2(4150, -40, 70, 360),
+	Rect2(3900, 320, 590, 40),
+	# The left pillar stops short of the floor, leaving a 90px doorway into the
+	# shaft. Full height, it walled the chimney off entirely: the player lands
+	# at x3990 and a 360px pillar is well past a 298px double jump.
+	Rect2(4150, -40, 70, 270),
 	Rect2(4420, -40, 70, 360),
 	Rect2(4620, -100, 220, 30),
 	Rect2(4980, -220, 130, 26),
@@ -68,6 +72,15 @@ const ENEMIES: Array = [
 const CHECKPOINTS: Array = [
 	Vector2(1780, -60), Vector2(2440, -360), Vector2(2900, -60),
 	Vector2(3380, 260), Vector2(3960, 260), Vector2(4660, -160), Vector2(5700, -520),
+]
+# Health pickups. Checkpoints restore health too, so these are the top-up
+# between them rather than the main supply.
+const HEARTS: Array = [
+	Vector2(1200, -130),
+	Vector2(2600, -360),
+	Vector2(3600, 260),
+	Vector2(4080, 260),
+	Vector2(5760, -520),
 ]
 const ORB_POS := Vector2(2510, -380)
 const POUND_ORB_POS := Vector2(2870, -180)
@@ -246,6 +259,10 @@ func _spawn_actors() -> void:
 	porb.ability_id = "ground_pound"
 	porb.tint = POUND_ORB_TINT
 	add_child(porb)
+	for hpos in HEARTS:
+		var heart: Area2D = HeartScript.new()
+		heart.position = hpos
+		add_child(heart)
 	for pos in CHECKPOINTS:
 		var c := CheckpointScene.instantiate()
 		c.position = pos
