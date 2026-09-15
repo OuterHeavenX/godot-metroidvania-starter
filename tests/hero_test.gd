@@ -32,7 +32,10 @@ func release_action(action: String) -> void:
 	Input.parse_input_event(ev)
 
 
-func _process(_delta: float) -> void:
+## Counts physics frames, not render frames: every assertion here is about
+## physics state, and on a render clock the timings drift whenever the scene
+## gains nodes -- which is exactly how adding the boss arena broke this.
+func _physics_process(_delta: float) -> void:
 	frame += 1
 	if frame == 5:
 		player = get_tree().get_first_node_in_group("player")

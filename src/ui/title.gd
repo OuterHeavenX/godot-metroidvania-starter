@@ -19,10 +19,22 @@ func _ready() -> void:
 	mute_button.pressed.connect(_on_mute)
 	_refresh_mute()
 	stats.text = _stats_line()
+	apply_touch_layout(DisplayServer.is_touchscreen_available())
 	if continue_button.visible:
 		continue_button.grab_focus()
 	else:
 		new_button.grab_focus()
+
+
+## See MVHud.apply_touch_layout for why this takes the flag as an argument.
+func apply_touch_layout(touch: bool) -> void:
+	$Hint.text = ("Tap NEW RUN — on-screen controls appear in game" if touch
+		else "A/D or arrows: move · Space: jump · Shift: dash · S/↓: pound · Esc: pause")
+	mute_button.add_theme_font_size_override("font_size", 20 if touch else 14)
+	mute_button.offset_top = 24.0 if touch else 14.0
+	mute_button.offset_bottom = 88.0 if touch else 54.0
+	mute_button.offset_left = -188.0 if touch else -156.0
+	mute_button.offset_right = -24.0 if touch else -16.0
 
 
 func _stats_line() -> String:

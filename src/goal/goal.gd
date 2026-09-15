@@ -4,13 +4,33 @@ extends Area2D
 signal won
 
 var done := false
+var locked := false
 var t := 0.0
 
 
 func _ready() -> void:
+	add_to_group("goal")
 	collision_layer = 0
 	collision_mask = 1
 	body_entered.connect(_on_body)
+
+
+## Held shut until the Warden falls. Dimmed so it reads as inert.
+func lock() -> void:
+	locked = true
+	modulate = Color(0.5, 0.55, 0.68)
+
+
+func unlock() -> void:
+	if not locked:
+		return
+	locked = false
+	modulate = Color.WHITE
+	AudioMan.play("checkpoint", 0.0, 0.7)
+	JuiceMan.shake(0.3)
+	JuiceMan.burst(global_position + Vector2(0, -40), Color(0.6, 0.95, 1.0),
+		22, 280.0, 0.7, 260.0, 5.0)
+	queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -20,6 +40,8 @@ func _process(delta: float) -> void:
 
 func _on_body(body: Node2D) -> void:
 	if done:
+		return
+	if locked:
 		return
 	if body.is_in_group("player"):
 		done = true

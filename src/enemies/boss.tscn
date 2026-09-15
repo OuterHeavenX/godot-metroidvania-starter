@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/enemies/boss.gd" id="1_54y0u"]
+[ext_resource type="Script" path="res://src/enemies/skeleton_visual.gd" id="2_6yuhe"]
+
+[sub_resource type="RectangleShape2D" id="body"]
+size = Vector2(56, 138)
+
+[sub_resource type="RectangleShape2D" id="stomp"]
+size = Vector2(52, 16)
+
+[node name="Boss" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 4
+script = ExtResource("1_54y0u")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("body")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("2_6yuhe")
+
+[node name="Sensors" type="Node2D" parent="."]
+
+[node name="WallCheck" type="RayCast2D" parent="Sensors"]
+position = Vector2(32, -48)
+target_position = Vector2(12, 0)
+collision_mask = 4
+
+[node name="FloorCheck" type="RayCast2D" parent="Sensors"]
+position = Vector2(32, -16)
+target_position = Vector2(12, 78)
+collision_mask = 4
+
+[node name="Stompbox" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Stompbox"]
+position = Vector2(0, -86)
+shape = SubResource("stomp")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -10)
+shape = SubResource("body")

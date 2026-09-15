@@ -189,15 +189,14 @@ func _physics_process(_delta: float) -> void:
 				# A freed Object compares equal to null in Godot 4, so the
 				# "was it there" and "is it gone" checks cannot share a test.
 				check(slab_found and not is_instance_valid(slab),
-					"pounded through the span into the vault")
+					"pounded through the span into the arena")
 				var p: Vector2 = player.global_position
-				# The goal's trigger reaches up the flag to about y-330, so
-				# winning now catches the player mid-drop rather than on the
-				# vault floor, and pauses the run there.
-				check(p.y > -420.0, "dropped through the span (x=%.0f y=%.0f)" % [p.x, p.y])
-				var hud := get_tree().get_first_node_in_group("hud")
-				check(hud != null and bool(hud.get("won")), "reaching the goal won the run")
-				check(get_tree().paused, "winning pauses the run")
+				check(p.y > -200.0, "dropped into the arena (x=%.0f y=%.0f)" % [p.x, p.y])
+				var boss := get_tree().get_first_node_in_group("boss")
+				check(boss != null, "the Warden is waiting in the arena")
+				var goal := get_tree().get_first_node_in_group("goal")
+				check(goal != null and bool(goal.get("locked")),
+					"the way out stays locked until the Warden falls")
 				_finish()
 		return
 

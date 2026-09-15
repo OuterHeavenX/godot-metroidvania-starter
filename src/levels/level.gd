@@ -11,6 +11,7 @@ const CheckpointScene := preload("res://src/checkpoint/checkpoint.tscn")
 const GoalScene := preload("res://src/goal/goal.tscn")
 const CrackedFloorScript := preload("res://src/world/cracked_floor.gd")
 const HeartScript := preload("res://src/pickups/heart.gd")
+const BossScene := preload("res://src/enemies/boss.tscn")
 
 @export var data: MVLevelData
 
@@ -218,6 +219,12 @@ func _spawn_actors() -> void:
 	goal.position = data.goal_position
 	goal.won.connect(_on_won)
 	add_child(goal)
+	if data.has_boss:
+		var boss := BossScene.instantiate()
+		boss.position = data.boss_position
+		add_child(boss)
+		goal.lock()
+		boss.defeated.connect(goal.unlock)
 
 
 func _on_player_died() -> void:

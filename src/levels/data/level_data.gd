@@ -20,6 +20,9 @@ extends Resource
 @export var checkpoints: Array[Vector2] = []
 @export var hearts: Array[Vector2] = []
 @export var goal_position := Vector2.ZERO
+## When set, the goal stays locked until the Warden is defeated.
+@export var has_boss := false
+@export var boss_position := Vector2.ZERO
 
 @export_group("Bounds")
 ## Camera clamp: position is the top-left corner, end is the bottom-right.

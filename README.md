@@ -23,9 +23,10 @@ src/                     All game code, one folder per feature
     player_visual.gd     Sprite + animation driving
     player.tscn
   enemies/
-    walker.gd
-    walker_visual.gd
-    walker.tscn
+    skeleton.gd / skeleton.tscn   warrior, spearman, archer
+    skeleton_visual.gd
+    arrow.gd
+    boss.gd / boss.tscn           The Warden (extends MVSkeleton)
   levels/
     level.gd             Generic builder: turns an MVLevelData into an area
     level_01.tscn        Main scene (player + HUD + touch controls + data)
@@ -64,6 +65,10 @@ tests/
   skeleton_test.gd
   health_test.gd         Hearts, checkpoint healing, full-health refusal
   pause_test.gd          Pause, resume and restart (survives the scene reload)
+  save_test.gd           Progress written and restored across a reload
+  title_test.gd          Continue and stats appear only with progress
+  boss_test.gd           Guard, pound-to-break, phase two, goal unlock
+  touch_test.gd          Phone layout
   undercroft_test.gd     Drives the new region's jumps against real collision
   script_check.gd        Loads every script so a syntax error fails the build
   runners/               Scenes CI launches with --scene
@@ -233,6 +238,28 @@ does. A level opened directly — by a test, or from the editor — therefore
 always starts clean, whatever happens to be on disk. Without that, a stale save
 from an earlier run would quietly hand the player abilities mid-test and break
 suites that assert an ability is still locked.
+
+## The Warden
+
+The Undercroft ends in an arena rather than the old sealed vault. `MVBoss`
+extends `MVSkeleton`, so it reuses the movement, sensors and animation, and
+overrides what differs:
+
+- **Guarded by default** — ordinary attacks ring off it and deal nothing.
+- **A ground pound breaks the guard**, opening a 3.2s window. That is
+  deliberate: the pound is the ability the Undercroft spends its whole length
+  teaching, so the fight asks for what the region taught.
+- **Phase two at half health** — faster, and a shorter attack cooldown.
+- The goal sits in the arena but starts **locked and dimmed**, and only unlocks
+  when the Warden falls.
+
+Set `has_boss` and `boss_position` on a level resource to use it elsewhere.
+
+### A note on test clocks
+
+`hero_test` counted render frames while asserting physics state, so adding the
+arena shifted its timing and broke two assertions that had nothing to do with
+the change. Tests that assert physics state should run on `_physics_process`.
 
 ## Level layout
 

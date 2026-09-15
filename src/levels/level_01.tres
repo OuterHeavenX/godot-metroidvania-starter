@@ -93,6 +93,13 @@ stands between you
 and the way out"
 position = Vector2(5660, -600)
 
+[sub_resource type="Resource" id="Resource_oxb6c"]
+script = ExtResource("2_sp832")
+text = "THE WARDEN
+its guard turns blades —
+pound to break it"
+position = Vector2(5900, -190)
+
 [sub_resource type="Resource" id="Resource_clprv"]
 script = ExtResource("3_b00yd")
 position = Vector2(2510, -380)
@@ -106,12 +113,14 @@ tint = Color(1, 0.6039216, 0.23529412, 1)
 [resource]
 script = ExtResource("4_i04je")
 level_name = "The Undercroft"
-platforms = Array[Rect2]([Rect2(0, 0, 560, 160), Rect2(680, 0, 380, 160), Rect2(1140, -70, 260, 230), Rect2(1460, -140, 260, 300), Rect2(1720, 0, 520, 160), Rect2(1900, -320, 70, 320), Rect2(2170, -320, 70, 320), Rect2(2360, -300, 300, 60), Rect2(2760, -560, 360, 60), Rect2(2760, 0, 360, 160), Rect2(3240, 0, 280, 160), Rect2(2820, -120, 100, 32), Rect2(3080, 160, 40, 160), Rect2(3240, 160, 40, 70), Rect2(3080, 320, 200, 40), Rect2(3280, 320, 420, 40), Rect2(3520, 140, 180, 20), Rect2(3900, 320, 590, 40), Rect2(4150, -40, 70, 270), Rect2(4420, -40, 70, 360), Rect2(4620, -100, 220, 30), Rect2(4980, -220, 130, 26), Rect2(5240, -340, 130, 26), Rect2(5500, -460, 130, 26), Rect2(5630, -460, 420, 160), Rect2(6150, -460, 300, 160), Rect2(6010, -300, 40, 160), Rect2(6150, -300, 40, 160), Rect2(6010, -140, 180, 40)])
+platforms = Array[Rect2]([Rect2(0, 0, 560, 160), Rect2(680, 0, 380, 160), Rect2(1140, -70, 260, 230), Rect2(1460, -140, 260, 300), Rect2(1720, 0, 520, 160), Rect2(1900, -320, 70, 320), Rect2(2170, -320, 70, 320), Rect2(2360, -300, 300, 60), Rect2(2760, -560, 360, 60), Rect2(2760, 0, 360, 160), Rect2(3240, 0, 280, 160), Rect2(2820, -120, 100, 32), Rect2(3080, 160, 40, 160), Rect2(3240, 160, 40, 70), Rect2(3080, 320, 200, 40), Rect2(3280, 320, 420, 40), Rect2(3520, 140, 180, 20), Rect2(3900, 320, 590, 40), Rect2(4150, -40, 70, 270), Rect2(4420, -40, 70, 360), Rect2(4620, -100, 220, 30), Rect2(4980, -220, 130, 26), Rect2(5240, -340, 130, 26), Rect2(5500, -460, 130, 26), Rect2(5630, -460, 420, 160), Rect2(6150, -460, 350, 160), Rect2(5800, 40, 700, 40), Rect2(5760, -300, 40, 340), Rect2(6500, -300, 40, 340)])
 cracked = Array[Rect2]([Rect2(3112, -30, 136, 30), Rect2(6050, -490, 100, 30)])
 player_start = Vector2(120, -120)
 enemies = Array[ExtResource("1_oxb6c")]([SubResource("Resource_mey8e"), SubResource("Resource_rnsal"), SubResource("Resource_6desd"), SubResource("Resource_58wfm"), SubResource("Resource_1ygyi"), SubResource("Resource_8bn5a"), SubResource("Resource_t2t8p"), SubResource("Resource_lb2of"), SubResource("Resource_wt7q8"), SubResource("Resource_jkr67"), SubResource("Resource_4omty")])
 orbs = Array[ExtResource("3_b00yd")]([SubResource("Resource_clprv"), SubResource("Resource_ttfqg")])
 checkpoints = Array[Vector2]([Vector2(1780, -60), Vector2(2440, -360), Vector2(2900, -60), Vector2(3380, 260), Vector2(3960, 260), Vector2(4660, -160), Vector2(5700, -520)])
 hearts = Array[Vector2]([Vector2(1200, -130), Vector2(2600, -360), Vector2(3600, 260), Vector2(4080, 260), Vector2(5760, -520)])
-goal_position = Vector2(6100, -200)
-hints = Array[ExtResource("2_sp832")]([SubResource("Resource_kurx8"), SubResource("Resource_qvahq"), SubResource("Resource_pbfgv"), SubResource("Resource_jw77q"), SubResource("Resource_4th2k"), SubResource("Resource_hsic5")])
+goal_position = Vector2(5880, -20)
+has_boss = true
+boss_position = Vector2(6320, -20)
+hints = Array[ExtResource("2_sp832")]([SubResource("Resource_kurx8"), SubResource("Resource_qvahq"), SubResource("Resource_pbfgv"), SubResource("Resource_jw77q"), SubResource("Resource_4th2k"), SubResource("Resource_hsic5"), SubResource("Resource_oxb6c")])
