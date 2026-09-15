@@ -1,6 +1,8 @@
 class_name MVCrackedFloor
 extends StaticBody2D
 
+signal broken
+
 
 var rect := Rect2(0, 0, 136, 30)
 ## Set by the level so the slab matches its surroundings: turned earth in the
@@ -10,6 +12,9 @@ var _broken := false
 
 
 func _ready() -> void:
+	var effects := preload("res://src/presentation/world_feedback.gd").new()
+	effects.kind = "floor"
+	add_child(effects)
 	add_to_group("cracked")
 	collision_layer = 4
 	collision_mask = 0
@@ -26,12 +31,7 @@ func break_floor() -> void:
 	if _broken:
 		return
 	_broken = true
-	AudioMan.play("pound", -2.0, 0.7)
-	JuiceMan.shake(0.4)
-	var dust := Color(0.45, 0.50, 0.68) if theme == "castle" else Color(0.62, 0.52, 0.38)
-	var chips := Color(0.70, 0.76, 0.92) if theme == "castle" else Color(0.9, 0.75, 0.5)
-	JuiceMan.burst(global_position, dust, 26, 360.0, 0.7, 1100.0, 6.0)
-	JuiceMan.burst(global_position, chips, 10, 200.0, 0.4, 500.0, 4.0)
+	broken.emit()
 	queue_free()
 
 

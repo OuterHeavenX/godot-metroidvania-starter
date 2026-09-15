@@ -1,6 +1,8 @@
 class_name MVHeart
 extends Area2D
 
+signal collected
+
 ## A health pickup. Unlike the ability orbs it refuses to be spent at full
 ## health, so it stays on the ground until it is actually worth taking.
 
@@ -13,6 +15,9 @@ var base_y := 0.0
 
 
 func _ready() -> void:
+	var effects := preload("res://src/presentation/world_feedback.gd").new()
+	effects.kind = "heart"
+	add_child(effects)
 	add_to_group("heart")
 	collision_layer = 0
 	collision_mask = 1
@@ -33,12 +38,11 @@ func _process(delta: float) -> void:
 
 func _on_body(body: Node2D) -> void:
 	var p := body as MVPlayer
-	if p == null:
+	if p == null or p.dead or is_queued_for_deletion():
 		return
 	if not p.heal(AMOUNT):
 		return
-	AudioMan.play("orb_pickup", -3.0, 1.25)
-	JuiceMan.burst(global_position, TINT, 16, 210.0, 0.55, 220.0, 4.0)
+	collected.emit()
 	queue_free()
 
 

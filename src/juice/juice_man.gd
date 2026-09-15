@@ -2,6 +2,7 @@ extends Node
 
 
 var _trauma := 0.0
+var shake_offset := Vector2.ZERO
 var _hit_stop_active := false
 
 const SHAKE_MAX := 26.0
@@ -25,13 +26,10 @@ func _tex(name: String) -> Texture2D:
 func _process(delta: float) -> void:
 	if _trauma > 0.0:
 		_trauma = maxf(_trauma - delta * 1.6, 0.0)
-		var cam := get_viewport().get_camera_2d()
-		if cam != null:
-			if _trauma <= 0.0:
-				cam.offset = Vector2.ZERO
-			else:
-				var s := _trauma * _trauma * SHAKE_MAX
-				cam.offset = Vector2(randf_range(-s, s), randf_range(-s, s))
+		var strength := _trauma * _trauma * SHAKE_MAX
+		shake_offset = Vector2(randf_range(-strength, strength), randf_range(-strength, strength))
+	else:
+		shake_offset = Vector2.ZERO
 
 
 func shake(amount: float) -> void:

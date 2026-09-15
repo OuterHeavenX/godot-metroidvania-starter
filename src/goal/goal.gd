@@ -2,6 +2,7 @@ extends Area2D
 
 
 signal won
+signal unlocked
 
 var done := false
 var locked := false
@@ -9,6 +10,9 @@ var t := 0.0
 
 
 func _ready() -> void:
+	var effects := preload("res://src/presentation/world_feedback.gd").new()
+	effects.kind = "goal"
+	add_child(effects)
 	add_to_group("goal")
 	collision_layer = 0
 	collision_mask = 1
@@ -44,10 +48,7 @@ func unlock() -> void:
 		return
 	locked = false
 	modulate = Color.WHITE
-	AudioMan.play("checkpoint", 0.0, 0.7)
-	JuiceMan.shake(0.3)
-	JuiceMan.burst(global_position + Vector2(0, -40), Color(0.6, 0.95, 1.0),
-		22, 280.0, 0.7, 260.0, 5.0)
+	unlocked.emit()
 	queue_redraw()
 
 
@@ -61,10 +62,8 @@ func _on_body(body: Node2D) -> void:
 		return
 	if locked:
 		return
-	if body.is_in_group("player"):
+	if body is MVPlayer and not body.dead:
 		done = true
-		AudioMan.play("goal_win")
-		JuiceMan.shake(0.25)
 		won.emit()
 
 

@@ -5,33 +5,41 @@
 [ext_resource type="Script" path="res://src/levels/data/orb_spawn.gd" id="3_p3sh5"]
 [ext_resource type="Script" path="res://src/levels/data/level_data.gd" id="4_ushmp"]
 
+[ext_resource type="Script" path="res://src/levels/data/world_spawn.gd" id="world_spawn"]
+
 [sub_resource type="Resource" id="Resource_u3ta0"]
 script = ExtResource("1_bj8xr")
+persistence_id = "Resource_u3ta0"
 position = Vector2(400, -60)
 kind = "shielder"
 
 [sub_resource type="Resource" id="Resource_v41eo"]
 script = ExtResource("1_bj8xr")
+persistence_id = "Resource_v41eo"
 position = Vector2(1020, 0)
 kind = "charger"
 
 [sub_resource type="Resource" id="Resource_cqok2"]
 script = ExtResource("1_bj8xr")
+persistence_id = "Resource_cqok2"
 position = Vector2(1600, 60)
 kind = "shielder"
 
 [sub_resource type="Resource" id="Resource_uxevs"]
 script = ExtResource("1_bj8xr")
+persistence_id = "Resource_uxevs"
 position = Vector2(2150, 60)
 kind = "charger"
 
 [sub_resource type="Resource" id="Resource_m5oof"]
 script = ExtResource("1_bj8xr")
+persistence_id = "Resource_m5oof"
 position = Vector2(2620, 60)
 kind = "archer"
 
 [sub_resource type="Resource" id="Resource_53aue"]
 script = ExtResource("1_bj8xr")
+persistence_id = "Resource_53aue"
 position = Vector2(2780, 60)
 kind = "shielder"
 
@@ -65,15 +73,45 @@ script = ExtResource("2_uypy2")
 text = "WALL JUMP the stairwell"
 position = Vector2(2500, -70)
 
+[sub_resource type="Resource" id="cracked_01"]
+script = ExtResource("world_spawn")
+persistence_id = "cracked_01"
+position = Vector2(1890, 105)
+size = Vector2(156, 30)
+
+[sub_resource type="Resource" id="hearts_01"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_01"
+position = Vector2(1890, 220)
+
+[sub_resource type="Resource" id="hearts_02"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_02"
+position = Vector2(2260, 60)
+
+[sub_resource type="Resource" id="checkpoints_01"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_01"
+position = Vector2(900, 0)
+
+[sub_resource type="Resource" id="checkpoints_02"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_02"
+position = Vector2(2560, 60)
+
 [resource]
 script = ExtResource("4_ushmp")
+area_id = "castle_hall"
 level_name = "The Castle Hall"
 platforms = Array[Rect2]([Rect2(0, 0, 620, 200), Rect2(840, 60, 360, 200), Rect2(1400, 120, 420, 160), Rect2(1960, 120, 340, 160), Rect2(1780, 280, 220, 40), Rect2(2500, 120, 680, 160), Rect2(2840, -240, 70, 270), Rect2(3110, -240, 70, 360), Rect2(3250, -300, 300, 60)])
-cracked = Array[Rect2]([Rect2(1812, 90, 156, 30)])
+breakables = Array[ExtResource("world_spawn")]([SubResource("cracked_01")])
+
 player_start = Vector2(140, -120)
 enemies = Array[ExtResource("1_bj8xr")]([SubResource("Resource_u3ta0"), SubResource("Resource_v41eo"), SubResource("Resource_cqok2"), SubResource("Resource_uxevs"), SubResource("Resource_m5oof"), SubResource("Resource_53aue")])
-checkpoints = Array[Vector2]([Vector2(900, 0), Vector2(2560, 60)])
-hearts = Array[Vector2]([Vector2(1890, 220), Vector2(2260, 60)])
+checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("checkpoints_01"), SubResource("checkpoints_02")])
+
+heart_spawns = Array[ExtResource("world_spawn")]([SubResource("hearts_01"), SubResource("hearts_02")])
+
 goal_position = Vector2(3400, -360)
 camera_limits = Rect2(-40, -560, 3660, 1100)
 theme = "castle"

@@ -114,7 +114,16 @@ func _load_muted() -> void:
 
 
 func _save_muted() -> void:
-	var cfg := ConfigFile.new()
-	cfg.load("user://metroidvania_starter.cfg")
-	cfg.set_value("audio", "muted", muted)
-	cfg.save("user://metroidvania_starter.cfg")
+	SaveMan.set_audio_muted(muted)
+
+
+func _exit_tree() -> void:
+	for player in _pool:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+	if is_instance_valid(_music):
+		_music.stop()
+		_music.stream = null
+	_pool.clear()
+	_sfx.clear()

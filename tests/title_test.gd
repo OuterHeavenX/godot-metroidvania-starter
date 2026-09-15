@@ -49,9 +49,7 @@ func _process(_delta: float) -> void:
 		check(stats.text == "", "no stats line on a fresh save")
 		get_tree().set_meta(META, 1)
 		get_tree().reload_current_scene()
-		t = 0
-		set_process(false)
-		get_tree().create_timer(0.1).timeout.connect(func () -> void: set_process(true))
+		return # The replacement scene owns the next test phase.
 	else:
 		check(cont.visible, "continue shown when progress exists")
 		check("1:31.25" in stats.text, "best time shown, got %s" % stats.text)

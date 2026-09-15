@@ -2,6 +2,10 @@ class_name MVSkeleton
 extends CharacterBody2D
 
 
+signal feedback(event: StringName, details: Dictionary)
+signal died
+var combat := MVCombat.new()
+
 const CFG := {
 	"warrior": {"speed": 85.0, "hp": 2, "melee_range": 70.0, "attack_cd": 1.25, "patrol": true, "dmg": 1},
 	"spearman": {"speed": 62.0, "hp": 3, "melee_range": 104.0, "attack_cd": 1.6, "patrol": true, "dmg": 1},
@@ -29,13 +33,16 @@ var cfg: Dictionary
 var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity", 980.0)
 var dir := -1.0
 var dead := false
-var hp := 2
+var hp: int:
+	get: return combat.hp
+	set(value): combat.hp = value
 var hit_flash := 0.0
 var state := "patrol"
 var state_t := 0.0
 var cd_t := 0.0
 var struck := false
 var knock_v := 0.0
+var visual_scale := 1.0
 
 @onready var sensors: Node2D = $Sensors
 @onready var wall_check: RayCast2D = $Sensors / WallCheck
@@ -48,7 +55,15 @@ func _ready() -> void:
 	if not CFG.has(kind):
 		kind = "warrior"
 	cfg = CFG[kind]
-	hp = int(cfg["hp"])
+	combat.name = "Combat"
+	combat.configure(int(cfg["hp"]))
+	combat.damage_policy = _damage_policy
+	combat.damaged.connect(_on_damaged)
+	combat.blocked.connect(_on_blocked)
+	combat.staggered.connect(_on_staggered)
+	combat.depleted.connect(die)
+	add_child(combat)
+	add_child(preload("res://src/presentation/enemy_feedback.gd").new())
 	floor_snap_length = 4.0
 	sensors.scale.x = dir
 	visual.setup(kind)
@@ -59,6 +74,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if dead:
 		return
+	combat.tick(delta)
 	hit_flash = maxf(hit_flash - delta, 0.0)
 	cd_t = maxf(cd_t - delta, 0.0)
 	if not is_on_floor():
@@ -73,7 +89,7 @@ func _physics_process(delta: float) -> void:
 			knock_v = lerpf(knock_v, 0.0, delta * 8.0)
 			if state_t <= 0.0:
 				state = "patrol"
-				visual.play("idle" if not bool(cfg["patrol"]) else "walk")
+				feedback.emit(&"animation", {"name": "idle" if not bool(cfg["patrol"]) else "walk"})
 		"attack":
 			velocity.x = 0.0
 			state_t -= delta
@@ -84,15 +100,15 @@ func _physics_process(delta: float) -> void:
 			if state_t <= 0.0:
 				state = "patrol"
 				cd_t = float(cfg["attack_cd"])
-				visual.play("walk" if bool(cfg["patrol"]) else "idle")
+				feedback.emit(&"animation", {"name": "walk" if bool(cfg["patrol"]) else "idle"})
 		"windup":
 			velocity.x = 0.0
 			state_t -= delta
 			if state_t <= 0.0:
 				state = "charge"
 				state_t = CHARGE_TIME
-				visual.play("runattack")
-				AudioMan.play("dash", -8.0, 0.7)
+				feedback.emit(&"animation", {"name": "runattack"})
+				feedback.emit(&"charge", {})
 		"charge":
 			state_t -= delta
 			velocity.x = dir * float(cfg.get("charge_speed", 300.0))
@@ -101,14 +117,14 @@ func _physics_process(delta: float) -> void:
 			if state_t <= 0.0:
 				state = "recover"
 				state_t = CHARGE_RECOVER
-				visual.play("idle")
+				feedback.emit(&"animation", {"name": "idle"})
 		"recover":
 			velocity.x = move_toward(velocity.x, 0.0, 900.0 * delta)
 			state_t -= delta
 			if state_t <= 0.0:
 				state = "patrol"
 				cd_t = float(cfg["attack_cd"])
-				visual.play("walk")
+				feedback.emit(&"animation", {"name": "walk"})
 		"shoot":
 			velocity.x = 0.0
 			state_t -= delta
@@ -118,11 +134,11 @@ func _physics_process(delta: float) -> void:
 			if state_t <= 0.0:
 				state = "patrol"
 				cd_t = float(cfg["shoot_cd"])
-				visual.play("idle")
+				feedback.emit(&"animation", {"name": "idle"})
 		_:
 			_patrol(delta, player)
 	move_and_slide()
-	visual.scale.x = dir
+	visual.scale.x = dir * visual_scale
 
 
 func _patrol(delta: float, player: Node2D) -> void:
@@ -131,10 +147,10 @@ func _patrol(delta: float, player: Node2D) -> void:
 		if wall_check.is_colliding() or not floor_check.is_colliding():
 			dir = -dir
 			sensors.scale.x = dir
-		visual.play("protect" if bool(cfg.get("blocks_front", false)) else "walk")
+		feedback.emit(&"animation", {"name": "protect" if bool(cfg.get("blocks_front", false)) else "walk"})
 	else:
 		velocity.x = 0.0
-		visual.play("idle")
+		feedback.emit(&"animation", {"name": "idle"})
 	if player == null or cd_t > 0.0:
 		return
 	var to_p: Vector2 = player.global_position - global_position
@@ -147,8 +163,8 @@ func _patrol(delta: float, player: Node2D) -> void:
 			state = "shoot"
 			state_t = 0.95
 			struck = false
-			visual.play("shot1")
-			AudioMan.play("attack", -8.0, 0.7)
+			feedback.emit(&"animation", {"name": "shot1"})
+			feedback.emit(&"shoot", {})
 	elif kind == "charger" and absf(to_p.x) < float(cfg["charge_range"]) \
 			and absf(to_p.x) > float(cfg["melee_range"]) and absf(to_p.y) < 70.0:
 		dir = signf(to_p.x)
@@ -157,8 +173,8 @@ func _patrol(delta: float, player: Node2D) -> void:
 		sensors.scale.x = dir
 		state = "windup"
 		state_t = CHARGE_WINDUP
-		visual.play("protect")
-		AudioMan.play("attack", -12.0, 0.6)
+		feedback.emit(&"animation", {"name": "protect"})
+		feedback.emit(&"windup", {})
 	else:
 		if absf(to_p.x) < float(cfg["melee_range"]) and absf(to_p.y) < 70.0:
 			dir = signf(to_p.x)
@@ -168,8 +184,8 @@ func _patrol(delta: float, player: Node2D) -> void:
 			state = "attack"
 			state_t = 0.55
 			struck = false
-			visual.play("attack1")
-			AudioMan.play("attack", -6.0, 0.8)
+			feedback.emit(&"animation", {"name": "attack1"})
+			feedback.emit(&"attack", {})
 
 
 func _melee_strike() -> void:
@@ -179,8 +195,7 @@ func _melee_strike() -> void:
 	var reach: float = float(cfg["melee_range"])
 	var to_p: Vector2 = player.global_position - global_position
 	if signf(to_p.x) == dir and absf(to_p.x) < reach and absf(to_p.y) < 80.0:
-		player.take_damage(int(cfg["dmg"]), global_position)
-		JuiceMan.burst(player.global_position, Color(0.8, 0.2, 0.2), 8, 200.0, 0.4, 500.0, 4.0)
+		MVDamage.deliver(player, MVDamage.new(int(cfg["dmg"]), global_position, MVDamage.Kind.CONTACT))
 
 
 func _fire_arrow() -> void:
@@ -203,8 +218,7 @@ func _on_stomp(body: Node2D) -> void:
 		return
 	if p.velocity.y > 60.0 and p.global_position.y < global_position.y - 8.0:
 		squash()
-		p.velocity.y = p.JUMP_VELOCITY * 0.7
-		p.jumps_used = 1
+		p.bounce_from_stomp()
 
 
 func _on_hurt(body: Node2D) -> void:
@@ -212,7 +226,12 @@ func _on_hurt(body: Node2D) -> void:
 		return
 	var p := body as MVPlayer
 	if p != null:
-		p.take_damage(int(cfg["dmg"]), global_position)
+		# At pound speed the player can cross both areas in one physics tick.
+		# Resolve the top-down hit first regardless of signal delivery order.
+		if p.velocity.y > 60.0 and p.global_position.y < global_position.y - 8.0:
+			_on_stomp(p)
+			return
+		MVDamage.deliver(p, MVDamage.new(int(cfg["dmg"]), global_position, MVDamage.Kind.CONTACT))
 
 
 ## True when a blow lands on the shield rather than the skeleton.
@@ -225,34 +244,39 @@ func blocks(from_pos: Vector2) -> bool:
 	return signf(from_pos.x - global_position.x) == dir
 
 
-func take_hit(from_pos: Vector2) -> void:
-
+func _damage_policy(hit: MVDamage) -> int:
 	if dead:
-		return
-	if blocks(from_pos):
-		hit_flash = 0.1
-		AudioMan.play("hit_enemy", -12.0, 0.5)
-		JuiceMan.burst(global_position + Vector2(dir * 22.0, -40.0),
-			Color(0.8, 0.85, 0.95), 5, 110.0, 0.25, 140.0, 3.0)
-		return
-	hp -= 1
+		return 0
+	if hit.kind == MVDamage.Kind.IMPACT:
+		return hp
+	return 0 if blocks(hit.origin) else hit.amount
+
+
+func take_hit(from_pos: Vector2) -> void:
+	combat.receive(MVDamage.new(1, from_pos))
+
+
+func _on_blocked(_hit: MVDamage) -> void:
+	hit_flash = 0.1
+	feedback.emit(&"block", {})
+
+
+func _on_staggered(_hit: MVDamage) -> void:
+	pass # Bosses define guard-break behavior without replacing health handling.
+
+
+func _on_damaged(hit: MVDamage) -> void:
 	hit_flash = 0.16
-	AudioMan.play("hit_enemy", -2.0, randf_range(0.9, 1.1))
-	var away: float = signf(global_position.x - from_pos.x)
-	if away == 0.0:
-		away = dir
-	knock_v = away * 240.0
-	if hp <= 0:
-		die()
-		return
-	state = "hurt"
-	state_t = 0.28
-	visual.play("hurt")
+	feedback.emit(&"hit", {})
+	knock_v = MVCombat.knockback(hit.origin, global_position, dir, 240.0, 0.0).x
+	if hp > 0:
+		state = "hurt"
+		state_t = 0.28
+		feedback.emit(&"animation", {"name": "hurt"})
 
 
 func squash() -> void:
-
-	die()
+	combat.receive(MVDamage.new(1, global_position, MVDamage.Kind.IMPACT))
 
 
 func die() -> void:
@@ -260,15 +284,13 @@ func die() -> void:
 		return
 	dead = true
 	state = "dead"
-	AudioMan.play("enemy_die", -2.0, randf_range(0.9, 1.15))
-	JuiceMan.shake(0.22)
-	JuiceMan.hit_stop(0.06)
-	JuiceMan.burst(global_position + Vector2(0, -30), Color(0.85, 0.82, 0.7), 16, 260.0, 0.5, 700.0, 5.0)
+	combat.hp = 0
+	died.emit()
+	feedback.emit(&"death", {})
 	$CollisionShape2D.set_deferred("disabled", true)
 	$Hurtbox.set_deferred("monitoring", false)
 	$Stompbox.set_deferred("monitoring", false)
 	velocity = Vector2.ZERO
-	visual.play("dead")
-	visual.dissolve()
+	feedback.emit(&"animation", {"name": "dead"})
 	await get_tree().create_timer(0.55).timeout
 	queue_free()

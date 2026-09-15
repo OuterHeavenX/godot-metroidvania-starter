@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://src/player/player.gd" id="1_iq7nu"]
 [ext_resource type="Script" path="res://src/player/player_visual.gd" id="2_uaeij"]
 
+[ext_resource type="Script" path="res://src/presentation/camera_rig.gd" id="camera_rig"]
+
 [sub_resource type="CapsuleShape2D" id="cap"]
 radius = 11.0
 height = 44.0
@@ -18,6 +20,7 @@ shape = SubResource("cap")
 script = ExtResource("2_uaeij")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1923184867]
+script = ExtResource("camera_rig")
 position = Vector2(0, -60)
 zoom = Vector2(1.4, 1.4)
 position_smoothing_enabled = true

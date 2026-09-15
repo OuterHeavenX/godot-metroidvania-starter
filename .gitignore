@@ -11,7 +11,8 @@ export.cfg
 
 # Export output. docs/ is the published web build and IS tracked;
 # everything else an export writes goes here and is not.
-/build/
+/build/*
+!/build/.gdignore
 /exports/
 *.exe
 *.x86_64
@@ -35,3 +36,8 @@ Thumbs.db
 *~
 .vscode/
 .idea/
+
+# Import metadata for legacy root export icons.
+/index.png.import
+/index.icon.png.import
+/index.apple-touch-icon.png.import

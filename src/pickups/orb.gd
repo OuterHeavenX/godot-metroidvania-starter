@@ -1,5 +1,7 @@
 extends Area2D
 
+signal collected
+
 
 @export var ability_id := "double_jump"
 @export var tint := Color("6ee7ff")
@@ -9,6 +11,9 @@ var base_y := 0.0
 
 
 func _ready() -> void:
+	var effects := preload("res://src/presentation/world_feedback.gd").new()
+	effects.kind = "orb"
+	add_child(effects)
 	collision_layer = 0
 	collision_mask = 1
 	base_y = position.y
@@ -23,12 +28,10 @@ func _process(delta: float) -> void:
 
 func _on_body(body: Node2D) -> void:
 	var p := body as MVPlayer
-	if p == null:
+	if p == null or p.dead or is_queued_for_deletion():
 		return
 	p.gain_ability(ability_id)
-	AudioMan.play("orb_pickup")
-	JuiceMan.burst(global_position, tint, 18, 240.0, 0.7, 200.0, 5.0, "magic")
-	JuiceMan.shake(0.2)
+	collected.emit()
 	queue_free()
 
 

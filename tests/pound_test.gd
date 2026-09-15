@@ -83,7 +83,7 @@ func _physics_process(_delta: float) -> void:
 		check(not is_instance_valid(_target_slab), "slab smashed by the pound")
 		check(get_tree().get_nodes_in_group("cracked").size() == _slab_count - 1,
 			"only the pounded slab was destroyed")
-	if player.global_position.y > 200.0:
+	if is_instance_valid(player) and player.global_position.y > 200.0:
 		_chamber_ok = true
 	if frame == 95:
 		check(_chamber_ok,
