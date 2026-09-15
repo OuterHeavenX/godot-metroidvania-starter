@@ -35,41 +35,39 @@ script = ExtResource("1_bj8xr")
 position = Vector2(2780, 60)
 kind = "shielder"
 
-[sub_resource type="Resource" id="Resource_gk3a0"]
+[sub_resource type="Resource" id="Resource_bj8xr"]
 script = ExtResource("2_uypy2")
-text = "THE SUNKEN WORKS
-what you learned
-comes with you"
-position = Vector2(120, -230)
+text = "THE CASTLE HALL"
+position = Vector2(120, -250)
 
-[sub_resource type="Resource" id="Resource_bsc7d"]
+[sub_resource type="Resource" id="Resource_uypy2"]
 script = ExtResource("2_uypy2")
 text = "SHIELDED:
 come round behind it,
 or pound it"
-position = Vector2(300, -170)
+position = Vector2(560, -150)
 
-[sub_resource type="Resource" id="Resource_wldpy"]
+[sub_resource type="Resource" id="Resource_p3sh5"]
 script = ExtResource("2_uypy2")
 text = "IT CHARGES:
 let it commit, then
 punish the recovery"
-position = Vector2(880, -120)
+position = Vector2(1120, -150)
 
-[sub_resource type="Resource" id="Resource_drahl"]
+[sub_resource type="Resource" id="Resource_ushmp"]
 script = ExtResource("2_uypy2")
-text = "Cracked floor —
-something below"
-position = Vector2(1560, -30)
+text = "Cracked flagstones —
+something beneath"
+position = Vector2(1540, -40)
 
-[sub_resource type="Resource" id="Resource_r24sv"]
+[sub_resource type="Resource" id="Resource_gk3a0"]
 script = ExtResource("2_uypy2")
-text = "WALL JUMP out"
-position = Vector2(2560, -60)
+text = "WALL JUMP the stairwell"
+position = Vector2(2500, -70)
 
 [resource]
 script = ExtResource("4_ushmp")
-level_name = "The Sunken Works"
+level_name = "The Castle Hall"
 platforms = Array[Rect2]([Rect2(0, 0, 620, 200), Rect2(840, 60, 360, 200), Rect2(1400, 120, 420, 160), Rect2(1960, 120, 340, 160), Rect2(1780, 280, 220, 40), Rect2(2500, 120, 680, 160), Rect2(2840, -240, 70, 270), Rect2(3110, -240, 70, 360), Rect2(3250, -300, 300, 60)])
 cracked = Array[Rect2]([Rect2(1812, 90, 156, 30)])
 player_start = Vector2(140, -120)
@@ -78,5 +76,6 @@ checkpoints = Array[Vector2]([Vector2(900, 0), Vector2(2560, 60)])
 hearts = Array[Vector2]([Vector2(1890, 220), Vector2(2260, 60)])
 goal_position = Vector2(3400, -360)
 camera_limits = Rect2(-40, -560, 3660, 1100)
-hints = Array[ExtResource("2_uypy2")]([SubResource("Resource_gk3a0"), SubResource("Resource_bsc7d"), SubResource("Resource_wldpy"), SubResource("Resource_drahl"), SubResource("Resource_r24sv")])
-background_span = Vector2(-400, 3700)
+theme = "castle"
+hints = Array[ExtResource("2_uypy2")]([SubResource("Resource_bj8xr"), SubResource("Resource_uypy2"), SubResource("Resource_p3sh5"), SubResource("Resource_ushmp"), SubResource("Resource_gk3a0")])
+background_span = Vector2(-600, 4200)

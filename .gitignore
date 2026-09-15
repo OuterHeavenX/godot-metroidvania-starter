@@ -25,6 +25,9 @@ export.cfg
 data_*/
 mono_crash.*.json
 
+# Diagnostic screenshots from tests/shot.gd -- regenerate, do not commit.
+/tools/shots/
+
 # OS and editor noise.
 .DS_Store
 Thumbs.db

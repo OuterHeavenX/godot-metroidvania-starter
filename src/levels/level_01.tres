@@ -55,6 +55,11 @@ script = ExtResource("1_oxb6c")
 position = Vector2(6300, -520)
 kind = "archer"
 
+[sub_resource type="Resource" id="Resource_sp832"]
+script = ExtResource("2_sp832")
+text = "HOLLOWMERE CEMETERY"
+position = Vector2(120, -230)
+
 [sub_resource type="Resource" id="Resource_kurx8"]
 script = ExtResource("2_sp832")
 text = "WALL JUMP:
@@ -77,7 +82,8 @@ position = Vector2(2960, -190)
 
 [sub_resource type="Resource" id="Resource_jw77q"]
 script = ExtResource("2_sp832")
-text = "THE UNDERCROFT"
+text = "THE UNDERCROFT
+the crypt below"
 position = Vector2(3300, 196)
 
 [sub_resource type="Resource" id="Resource_4th2k"]
@@ -112,7 +118,7 @@ tint = Color(1, 0.6039216, 0.23529412, 1)
 
 [resource]
 script = ExtResource("4_i04je")
-level_name = "The Undercroft"
+level_name = "Hollowmere Cemetery"
 next_level = "res://src/levels/level_02.tscn"
 platforms = Array[Rect2]([Rect2(0, 0, 560, 160), Rect2(680, 0, 380, 160), Rect2(1140, -70, 260, 230), Rect2(1460, -140, 260, 300), Rect2(1720, 0, 520, 160), Rect2(1900, -320, 70, 320), Rect2(2170, -320, 70, 320), Rect2(2360, -300, 300, 60), Rect2(2760, -560, 360, 60), Rect2(2760, 0, 360, 160), Rect2(3240, 0, 280, 160), Rect2(2820, -120, 100, 32), Rect2(3080, 160, 40, 160), Rect2(3240, 160, 40, 70), Rect2(3080, 320, 200, 40), Rect2(3280, 320, 420, 40), Rect2(3520, 140, 180, 20), Rect2(3900, 320, 590, 40), Rect2(4150, -40, 70, 270), Rect2(4420, -40, 70, 360), Rect2(4620, -100, 220, 30), Rect2(4980, -220, 130, 26), Rect2(5240, -340, 130, 26), Rect2(5500, -460, 130, 26), Rect2(5630, -460, 420, 160), Rect2(6150, -460, 350, 160), Rect2(5800, 40, 700, 40), Rect2(5760, -300, 40, 340), Rect2(6500, -300, 40, 340)])
 cracked = Array[Rect2]([Rect2(3112, -30, 136, 30), Rect2(6050, -490, 100, 30)])
@@ -124,4 +130,5 @@ hearts = Array[Vector2]([Vector2(1200, -130), Vector2(2600, -360), Vector2(3600,
 goal_position = Vector2(5880, -20)
 has_boss = true
 boss_position = Vector2(6320, -20)
-hints = Array[ExtResource("2_sp832")]([SubResource("Resource_kurx8"), SubResource("Resource_qvahq"), SubResource("Resource_pbfgv"), SubResource("Resource_jw77q"), SubResource("Resource_4th2k"), SubResource("Resource_hsic5"), SubResource("Resource_oxb6c")])
+hints = Array[ExtResource("2_sp832")]([SubResource("Resource_sp832"), SubResource("Resource_kurx8"), SubResource("Resource_qvahq"), SubResource("Resource_pbfgv"), SubResource("Resource_jw77q"), SubResource("Resource_4th2k"), SubResource("Resource_hsic5"), SubResource("Resource_oxb6c")])
+background_span = Vector2(-600, 7000)

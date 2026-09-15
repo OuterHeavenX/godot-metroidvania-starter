@@ -3,6 +3,9 @@ extends StaticBody2D
 
 
 var rect := Rect2(0, 0, 136, 30)
+## Set by the level so the slab matches its surroundings: turned earth in the
+## cemetery, cut flagstone inside the castle.
+var theme := "cemetery"
 var _broken := false
 
 
@@ -25,17 +28,22 @@ func break_floor() -> void:
 	_broken = true
 	AudioMan.play("pound", -2.0, 0.7)
 	JuiceMan.shake(0.4)
-	JuiceMan.burst(global_position, Color(0.62, 0.52, 0.38), 26, 360.0, 0.7, 1100.0, 6.0)
-	JuiceMan.burst(global_position, Color(0.9, 0.75, 0.5), 10, 200.0, 0.4, 500.0, 4.0)
+	var dust := Color(0.45, 0.50, 0.68) if theme == "castle" else Color(0.62, 0.52, 0.38)
+	var chips := Color(0.70, 0.76, 0.92) if theme == "castle" else Color(0.9, 0.75, 0.5)
+	JuiceMan.burst(global_position, dust, 26, 360.0, 0.7, 1100.0, 6.0)
+	JuiceMan.burst(global_position, chips, 10, 200.0, 0.4, 500.0, 4.0)
 	queue_free()
 
 
 func _draw() -> void:
 	var r := Rect2(-rect.size * 0.5, rect.size)
 
-	draw_rect(r, Color("4a3d2c"))
-	draw_rect(Rect2(r.position, Vector2(r.size.x, 5)), Color("6b5a40"))
-	draw_rect(r, Color("141008"), false, 2.5)
+	var body := Color("3c4463") if theme == "castle" else Color("4a3d2c")
+	var lip := Color("5b689a") if theme == "castle" else Color("6b5a40")
+	var edge := Color("10131f") if theme == "castle" else Color("141008")
+	draw_rect(r, body)
+	draw_rect(Rect2(r.position, Vector2(r.size.x, 5)), lip)
+	draw_rect(r, edge, false, 2.5)
 
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(rect.size.x * 13.0 + rect.size.y)
