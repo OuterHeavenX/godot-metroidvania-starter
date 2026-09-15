@@ -269,5 +269,6 @@ func die() -> void:
 	$Stompbox.set_deferred("monitoring", false)
 	velocity = Vector2.ZERO
 	visual.play("dead")
+	visual.dissolve()
 	await get_tree().create_timer(0.55).timeout
 	queue_free()

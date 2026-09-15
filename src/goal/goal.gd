@@ -13,6 +13,24 @@ func _ready() -> void:
 	collision_layer = 0
 	collision_mask = 1
 	body_entered.connect(_on_body)
+	# sparks rising through the portal
+	var sparks := CPUParticles2D.new()
+	sparks.position = Vector2(0, -60)
+	sparks.amount = 12
+	sparks.lifetime = 1.6
+	sparks.preprocess = 1.6
+	sparks.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	sparks.emission_rect_extents = Vector2(20, 50)
+	sparks.direction = Vector2(0, -1)
+	sparks.spread = 18.0
+	sparks.initial_velocity_min = 30.0
+	sparks.initial_velocity_max = 70.0
+	sparks.gravity = Vector2(0, -30)
+	sparks.scale_amount_min = 1.5
+	sparks.scale_amount_max = 3.0
+	sparks.color = Color(0.55, 0.9, 1.0, 0.8)
+	add_child(sparks)
+	sparks.emitting = true
 
 
 ## Held shut until the Warden falls. Dimmed so it reads as inert.
@@ -64,6 +82,12 @@ func _draw() -> void:
 
 	draw_rect(Rect2(-32, -128, 64, 14), Color("2e3a5c"))
 	draw_rect(Rect2(-32, -128, 64, 14), Color("0d1120"), false, 2.0)
+
+	# swirling energy bands inside the portal
+	for i in range(3):
+		var a0 := t * (1.6 + i * 0.5) + i * TAU / 3.0
+		draw_arc(Vector2(0, -58), 15.0 + i * 5.0, a0, a0 + 2.4, 26,
+			Color(0.5, 0.9, 1.0, 0.45 - i * 0.08), 2.5)
 
 	var bob := sin(t * 3.0) * 4.0
 	var chev := PackedVector2Array( [

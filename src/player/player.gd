@@ -66,6 +66,9 @@ var _fall_v := 0.0
 var spawn_point := Vector2.ZERO
 
 @onready var visual: Node2D = $Visual
+var _spark_t := 0.0 # wall-slide spark timer
+var _run_dust_t := 0.0 # run dust timer
+
 @onready var camera: Camera2D = $Camera2D
 
 
@@ -109,6 +112,31 @@ func _do_attack() -> void:
 		if absf(to.y) < ATTACK_HALF_HEIGHT and to.x * facing > -ATTACK_BACK_GRACE \
 				and to.length() < ATTACK_RANGE:
 			foe.take_hit(global_position)
+
+
+func _process(delta: float) -> void:
+	if dead:
+		return
+	# wall-slide sparks
+	var sliding := is_on_wall_only() and not is_on_floor() and velocity.y > 60.0
+	if sliding:
+		_spark_t -= delta
+		if _spark_t <= 0.0:
+			_spark_t = 0.09
+			var n := get_wall_normal()
+			JuiceMan.burst(global_position + Vector2(-n.x * 14.0, -6.0),
+				Color(1.0, 0.8, 0.4, 0.9), 3, 160.0, 0.25, 500.0, 3.5)
+	else:
+		_spark_t = 0.0
+	# run dust kicked up at speed
+	if is_on_floor() and absf(velocity.x) > 260.0 and dash_timer <= 0.0:
+		_run_dust_t -= delta
+		if _run_dust_t <= 0.0:
+			_run_dust_t = 0.16
+			JuiceMan.burst(global_position + Vector2(-facing * 12.0, 20.0),
+				Color(0.55, 0.6, 0.75, 0.55), 3, 90.0, 0.35, 350.0, 3.5)
+	else:
+		_run_dust_t = 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -222,7 +250,7 @@ func _physics_process(delta: float) -> void:
 		_pound_impact()
 	elif not _was_floor and is_on_floor() and _fall_v > 520.0 and not dead:
 		JuiceMan.burst(global_position + Vector2(0, 20), Color(0.55, 0.6, 0.75, 0.8),
-			8, 150.0, 0.4, 500.0, 4.0)
+			8, 150.0, 0.5, 500.0, 4.0, "smoke")
 		AudioMan.play("land", -6.0)
 
 
@@ -246,8 +274,9 @@ func _pound_impact() -> void:
 	JuiceMan.shake(0.55)
 	JuiceMan.hit_stop(0.08)
 	var feet := global_position + Vector2(0, 22)
-	JuiceMan.burst(feet, Color(0.75, 0.68, 0.55, 0.9), 22, 380.0, 0.5, 900.0, 6.0)
+	JuiceMan.burst(feet, Color(0.75, 0.68, 0.55, 0.9), 22, 380.0, 0.6, 900.0, 6.0, "smoke")
 	JuiceMan.burst(feet, Color(1.0, 0.85, 0.5, 0.7), 10, 200.0, 0.3, 100.0, 8.0)
+	JuiceMan.ring(feet, Color(1.0, 0.88, 0.6), 170.0, 0.5, 10.0)
 	for e in get_tree().get_nodes_in_group("enemy"):
 		var foe := e as Node2D
 		if foe == null or not foe.has_method("squash"):
