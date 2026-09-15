@@ -29,8 +29,8 @@ src/                     All game code, one folder per feature
     boss.gd / boss.tscn           The Warden (extends MVSkeleton)
   levels/
     level.gd             Generic builder: turns an MVLevelData into an area
-    level_01.tscn        Main scene (player + HUD + touch controls + data)
-    level_01.tres        The area itself, as data
+    level_01.tscn/.tres  Area one: the opening run and the Undercroft
+    level_02.tscn/.tres  Area two: the Sunken Works
     data/
       level_data.gd      MVLevelData: terrain, actors, bounds, dressing
       enemy_spawn.gd     MVEnemySpawn: position + kind
@@ -69,6 +69,8 @@ tests/
   title_test.gd          Continue and stats appear only with progress
   boss_test.gd           Guard, pound-to-break, phase two, goal unlock
   touch_test.gd          Phone layout
+  area2_test.gd          Area two builds; shielder and charger behaviour
+  transition_test.gd     Clearing an area hands you to the next with abilities
   undercroft_test.gd     Drives the new region's jumps against real collision
   script_check.gd        Loads every script so a syntax error fails the build
   runners/               Scenes CI launches with --scene
@@ -246,6 +248,47 @@ does. A level opened directly — by a test, or from the editor — therefore
 always starts clean, whatever happens to be on disk. Without that, a stale save
 from an earlier run would quietly hand the player abilities mid-test and break
 suites that assert an ability is still locked.
+
+## Areas and transitions
+
+An area links to the next with `next_level` on its `MVLevelData`. Clearing one
+banks its time, drops its checkpoint (a checkpoint means nothing in another
+area) and offers **NEXT AREA**; the last area ends the run and reports the
+total. `SaveMan.level_path` remembers where you were, so Continue resumes the
+right area.
+
+Adding an area is a `.tres` plus a fifteen-line `.tscn` that points at it —
+remember the node ids, see above.
+
+| Area | Contents |
+| ---- | -------- |
+| `level_01` | Opening run, wall-jump shaft, both ability orbs, the Undercroft, the Warden |
+| `level_02` | The Sunken Works: shielders, chargers, a cracked floor with a cache below, and a wall-jump climb out |
+
+Area two assumes both abilities, because you arrive with them.
+
+## Enemies
+
+| Kind | Sheet | Behaviour |
+| ---- | ----- | --------- |
+| `warrior` | warrior | Patrols, melee |
+| `spearman` | spearman | Slower, longer reach |
+| `archer` | archer | Stationary, fires within 340px |
+| `shielder` | spearman | Turns aside blows from the side it faces; come round behind it or pound it |
+| `charger` | warrior | Winds up, commits to a run, then a recovery window |
+| Warden | warrior | The boss — see below |
+
+`shielder` and `charger` reuse existing sheets via `SHEET` in
+`skeleton_visual.gd`, and use the `Protect` and `Run+attack` strips that were
+shipped in the asset set but never wired up.
+
+## Music
+
+`AudioMan.play_music(path)` switches loops and no-ops if the track is already
+playing, so an area that wants the default does not restart it on transition.
+Set `music` on a level resource to give an area its own track. Both areas
+currently share the one track in the asset set — the mechanism is there, the
+second track is not something I could author.
 
 ## The Warden
 

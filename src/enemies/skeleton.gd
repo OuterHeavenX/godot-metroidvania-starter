@@ -10,7 +10,17 @@ const CFG := {
 	# player sit off-centre, leaving ~350px before an archer would be shooting
 	# from off screen. Re-check this if the camera zoom changes.
 	"archer": {"speed": 0.0, "hp": 2, "shoot_range": 340.0, "shoot_cd": 2.4, "patrol": false, "dmg": 1},
+	# Holds a shield toward you: blades from the front are turned aside, so come
+	# round it or pound it. Slow enough that going round is realistic.
+	"shielder": {"speed": 48.0, "hp": 3, "melee_range": 96.0, "attack_cd": 1.9,
+		"patrol": true, "dmg": 1, "blocks_front": true},
+	# Winds up, then commits to a run. The recovery afterwards is the opening.
+	"charger": {"speed": 80.0, "hp": 2, "melee_range": 64.0, "attack_cd": 2.4,
+		"patrol": true, "dmg": 1, "charge_range": 280.0, "charge_speed": 330.0},
 }
+const CHARGE_WINDUP := 0.45
+const CHARGE_TIME := 0.55
+const CHARGE_RECOVER := 0.85
 const ArrowScript := preload("res://src/enemies/arrow.gd")
 
 @export var kind := "warrior"
@@ -75,6 +85,30 @@ func _physics_process(delta: float) -> void:
 				state = "patrol"
 				cd_t = float(cfg["attack_cd"])
 				visual.play("walk" if bool(cfg["patrol"]) else "idle")
+		"windup":
+			velocity.x = 0.0
+			state_t -= delta
+			if state_t <= 0.0:
+				state = "charge"
+				state_t = CHARGE_TIME
+				visual.play("runattack")
+				AudioMan.play("dash", -8.0, 0.7)
+		"charge":
+			state_t -= delta
+			velocity.x = dir * float(cfg.get("charge_speed", 300.0))
+			if wall_check.is_colliding() or not floor_check.is_colliding():
+				state_t = 0.0
+			if state_t <= 0.0:
+				state = "recover"
+				state_t = CHARGE_RECOVER
+				visual.play("idle")
+		"recover":
+			velocity.x = move_toward(velocity.x, 0.0, 900.0 * delta)
+			state_t -= delta
+			if state_t <= 0.0:
+				state = "patrol"
+				cd_t = float(cfg["attack_cd"])
+				visual.play("walk")
 		"shoot":
 			velocity.x = 0.0
 			state_t -= delta
@@ -97,7 +131,7 @@ func _patrol(delta: float, player: Node2D) -> void:
 		if wall_check.is_colliding() or not floor_check.is_colliding():
 			dir = -dir
 			sensors.scale.x = dir
-		visual.play("walk")
+		visual.play("protect" if bool(cfg.get("blocks_front", false)) else "walk")
 	else:
 		velocity.x = 0.0
 		visual.play("idle")
@@ -115,6 +149,16 @@ func _patrol(delta: float, player: Node2D) -> void:
 			struck = false
 			visual.play("shot1")
 			AudioMan.play("attack", -8.0, 0.7)
+	elif kind == "charger" and absf(to_p.x) < float(cfg["charge_range"]) \
+			and absf(to_p.x) > float(cfg["melee_range"]) and absf(to_p.y) < 70.0:
+		dir = signf(to_p.x)
+		if dir == 0.0:
+			dir = 1.0
+		sensors.scale.x = dir
+		state = "windup"
+		state_t = CHARGE_WINDUP
+		visual.play("protect")
+		AudioMan.play("attack", -12.0, 0.6)
 	else:
 		if absf(to_p.x) < float(cfg["melee_range"]) and absf(to_p.y) < 70.0:
 			dir = signf(to_p.x)
@@ -171,9 +215,25 @@ func _on_hurt(body: Node2D) -> void:
 		p.take_damage(int(cfg["dmg"]), global_position)
 
 
+## True when a blow lands on the shield rather than the skeleton.
+func blocks(from_pos: Vector2) -> bool:
+	if not bool(cfg.get("blocks_front", false)):
+		return false
+	if state in ["hurt", "dead"]:
+		return false
+	# Only the side it is facing is covered.
+	return signf(from_pos.x - global_position.x) == dir
+
+
 func take_hit(from_pos: Vector2) -> void:
 
 	if dead:
+		return
+	if blocks(from_pos):
+		hit_flash = 0.1
+		AudioMan.play("hit_enemy", -12.0, 0.5)
+		JuiceMan.burst(global_position + Vector2(dir * 22.0, -40.0),
+			Color(0.8, 0.85, 0.95), 5, 110.0, 0.25, 140.0, 3.0)
 		return
 	hp -= 1
 	hit_flash = 0.16

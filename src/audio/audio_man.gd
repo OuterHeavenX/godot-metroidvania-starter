@@ -9,6 +9,7 @@ const SFX_NAMES :=  [
 const POOL_SIZE := 8
 const MUSIC_DB := -17.0
 const AUDIO_DIR := "res://assets/audio/"
+const DEFAULT_MUSIC := "res://assets/audio/music_loop.res"
 
 
 const THROTTLE := {
@@ -23,6 +24,7 @@ var _sfx := {}
 var _pool: Array[AudioStreamPlayer] = []
 var _pool_i := 0
 var _music: AudioStreamPlayer
+var _music_path := ""
 var _last_play := {}
 
 
@@ -43,18 +45,30 @@ func _ready() -> void:
 	_music = AudioStreamPlayer.new()
 	_music.bus = &"Master"
 	add_child(_music)
-	var mpath := AUDIO_DIR + "music_loop.res"
-	if ResourceLoader.exists(mpath):
-		var stream: AudioStreamWAV = load(mpath)
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		stream.loop_begin = 0
-		# data.size() is a frame count only for uncompressed 16-bit PCM. The
-		# imported stream is QOA-compressed, so this looped a 40s track at ~8s.
-		stream.loop_end = int(stream.get_length() * stream.mix_rate)
-		_music.stream = stream
-		_music.volume_db = MUSIC_DB
-		_music.play()
+	play_music(DEFAULT_MUSIC)
 	_apply_mute()
+
+
+## Switches the loop, or does nothing if that track is already playing -- so an
+## area that wants the default does not restart it on every transition. Pass an
+## empty path for the default.
+func play_music(path: String) -> void:
+	var want := path if path != "" else DEFAULT_MUSIC
+	if want == _music_path and _music != null and _music.playing:
+		return
+	if not ResourceLoader.exists(want):
+		push_warning("AudioMan: missing music " + want)
+		return
+	var stream: AudioStreamWAV = load(want)
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_begin = 0
+	# data.size() is a frame count only for uncompressed 16-bit PCM. The
+	# imported stream is QOA-compressed, so this looped a 40s track at ~8s.
+	stream.loop_end = int(stream.get_length() * stream.mix_rate)
+	_music.stream = stream
+	_music.volume_db = MUSIC_DB
+	_music.play()
+	_music_path = want
 
 
 func _unhandled_input(event: InputEvent) -> void:

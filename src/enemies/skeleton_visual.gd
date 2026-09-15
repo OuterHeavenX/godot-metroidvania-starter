@@ -6,11 +6,19 @@ const ANIMS := {
 	"warrior": {"idle": 7, "walk": 7, "attack1": 5, "attack2": 6, "hurt": 2, "dead": 4},
 	"spearman": {"idle": 7, "walk": 7, "attack1": 4, "attack2": 4, "hurt": 3, "dead": 4},
 	"archer": {"idle": 7, "walk": 8, "attack1": 5, "hurt": 2, "dead": 5, "shot1": 15},
+	# Both new kinds reuse an existing sheet; see SHEET below.
+	"shielder": {"idle": 7, "walk": 7, "attack1": 4, "hurt": 3, "dead": 4,
+		"protect": 2, "run": 6},
+	"charger": {"idle": 7, "walk": 7, "attack1": 5, "hurt": 2, "dead": 4,
+		"protect": 1, "run": 8, "runattack": 7},
 }
+## Which sprite folder a kind draws from, when it is not its own name.
+const SHEET := {"shielder": "spearman", "charger": "warrior"}
 const FILES := {"idle": "Idle.png", "walk": "Walk.png", "attack1": "Attack_1.png",
-	"attack2": "Attack_2.png", "hurt": "Hurt.png", "dead": "Dead.png", "shot1": "Shot_1.png"}
+	"attack2": "Attack_2.png", "hurt": "Hurt.png", "dead": "Dead.png", "shot1": "Shot_1.png",
+	"protect": "Protect.png", "run": "Run.png", "runattack": "Run+attack.png"}
 const FPS := {"idle": 8, "walk": 10, "attack1": 13, "attack2": 13,
-	"hurt": 10, "dead": 9, "shot1": 16}
+	"hurt": 10, "dead": 9, "shot1": 16, "protect": 6, "run": 12, "runattack": 13}
 
 var kind := "warrior"
 var sprite: AnimatedSprite2D
@@ -24,7 +32,7 @@ func setup(p_kind: String) -> void:
 
 func _build() -> void:
 	var frames := SpriteFrames.new()
-	var dir := "res://assets/sprites/enemies/skeleton_%s/" % kind
+	var dir := "res://assets/sprites/enemies/skeleton_%s/" % SHEET.get(kind, kind)
 	var names: Dictionary = ANIMS[kind]
 	for anim_name in names.keys():
 		var file: String = dir + FILES[anim_name]
@@ -34,7 +42,8 @@ func _build() -> void:
 			continue
 		frames.add_animation(anim_name)
 		frames.set_animation_speed(anim_name, FPS.get(anim_name, 10))
-		frames.set_animation_loop(anim_name, anim_name == "idle" or anim_name == "walk")
+		frames.set_animation_loop(anim_name,
+			anim_name in ["idle", "walk", "run", "protect"])
 		var count: int = names[anim_name]
 		for i in range(count):
 			var at := AtlasTexture.new()

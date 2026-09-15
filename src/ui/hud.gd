@@ -15,8 +15,11 @@ extends CanvasLayer
 @onready var title_button: Button = $Overlay / PausePanel / Panel / VBox / Title2
 @onready var win_time: Label = $Overlay / WinPanel / Panel / VBox / Time
 @onready var key_hint: Label = $Hint
+@onready var win_title: Label = $Overlay / WinPanel / Panel / VBox / Title
+@onready var win_sub: Label = $Overlay / WinPanel / Panel / VBox / Sub
 
 var won := false
+var _next_level := ""
 
 
 func _ready() -> void:
@@ -26,7 +29,7 @@ func _ready() -> void:
 	pause_button.pressed.connect(func () -> void: _set_pause(true))
 	resume_button.pressed.connect(func () -> void: _set_pause(false))
 	restart_button.pressed.connect(restart)
-	again_button.pressed.connect(restart)
+	again_button.pressed.connect(_on_again)
 	title_button.pressed.connect(quit_to_title)
 	apply_touch_layout(DisplayServer.is_touchscreen_available())
 
@@ -77,6 +80,31 @@ func _show_touch_controls(vis: bool) -> void:
 		(n as CanvasLayer).visible = vis
 
 
+func _on_again() -> void:
+	if _next_level != "":
+		AudioMan.play("ui_click")
+		get_tree().paused = false
+		SaveMan.resume_requested = true
+		get_tree().change_scene_to_file(_next_level)
+		return
+	restart()
+
+
+## Between areas: same panel, but it carries you onward instead of restarting.
+func show_area_cleared(next_level: String, banked: float) -> void:
+	won = true
+	_next_level = next_level
+	win_title.text = "AREA CLEAR!"
+	win_sub.text = "The way ahead opens."
+	win_time.text = "Run so far  %s" % SaveMan.format_time(banked)
+	win_time.visible = true
+	again_button.text = "NEXT AREA"
+	win_panel.visible = true
+	pause_panel.visible = false
+	_show_touch_controls(false)
+	get_tree().paused = true
+
+
 func quit_to_title() -> void:
 	AudioMan.play("ui_click")
 	get_tree().paused = false
@@ -113,6 +141,8 @@ func on_ability_gained(ability_id: String) -> void:
 
 func show_win(seconds: float = 0.0, previous_best: float = 0.0) -> void:
 	won = true
+	_next_level = ""
+	again_button.text = "PLAY AGAIN"
 	if seconds > 0.0:
 		var line := "Time  %s" % SaveMan.format_time(seconds)
 		if previous_best > 0.0 and seconds < previous_best:

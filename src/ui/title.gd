@@ -51,7 +51,10 @@ func _stats_line() -> String:
 func _on_continue() -> void:
 	AudioMan.play("ui_click")
 	SaveMan.resume_requested = true
-	get_tree().change_scene_to_file(LEVEL)
+	var target: String = SaveMan.level_path if SaveMan.level_path != "" else LEVEL
+	if not ResourceLoader.exists(target):
+		target = LEVEL
+	get_tree().change_scene_to_file(target)
 
 
 func _on_new_run() -> void:

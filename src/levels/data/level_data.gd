@@ -6,6 +6,10 @@ extends Resource
 ## than new code.
 
 @export var level_name := "Untitled"
+## Scene of the area this one leads to. Empty means this is the last area.
+@export_file("*.tscn") var next_level := ""
+## Optional per-area music; falls back to AudioMan's default when empty.
+@export_file("*.res") var music := ""
 
 @export_group("Terrain")
 ## Solid ground. Each rect is drawn and given a matching StaticBody2D.

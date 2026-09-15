@@ -26,6 +26,7 @@ func _ready() -> void:
 	if data == null:
 		push_error("MVLevel has no MVLevelData assigned; nothing to build.")
 		return
+	AudioMan.play_music(data.music)
 	_build_background()
 	_build_terrain()
 	_build_hints()
@@ -42,21 +43,31 @@ func _ready() -> void:
 	player.health_changed.connect(hud.set_hearts)
 	player.ability_gained.connect(hud.on_ability_gained)
 	player.ability_gained.connect(SaveMan.note_ability)
-	player.checkpoint_set.connect(SaveMan.note_checkpoint)
+	player.checkpoint_set.connect(_on_checkpoint_set)
 	player.died.connect(_on_player_died)
 	hud.set_hearts(player.hp, player.MAX_HP)
 	_restore_progress()
 
 
-## Only applied when the title screen asked to continue, so a level opened
-## directly -- by a test, or from the editor -- always starts clean.
+func scene_path() -> String:
+	return scene_file_path
+
+
+func _on_checkpoint_set(pos: Vector2) -> void:
+	SaveMan.note_checkpoint(pos, scene_path())
+
+
+## Only applied when the title screen asked to continue, or when arriving from
+## the previous area. A level opened directly -- by a test, or from the editor
+## -- always starts clean.
 func _restore_progress() -> void:
 	if not SaveMan.resume_requested:
 		return
 	SaveMan.resume_requested = false
 	for ability_id in SaveMan.abilities:
 		player.gain_ability(ability_id)
-	if SaveMan.has_checkpoint:
+	# A checkpoint only means something inside the area it was set in.
+	if SaveMan.checkpoint_for(scene_path()):
 		player.set_checkpoint(SaveMan.checkpoint)
 		player.global_position = SaveMan.checkpoint
 
@@ -240,6 +251,11 @@ func _on_won() -> void:
 	if finished:
 		return
 	finished = true
+	if data.next_level != "":
+		SaveMan.note_area_cleared(data.next_level, elapsed)
+		hud.show_area_cleared(data.next_level, SaveMan.run_time)
+		return
+	var total := SaveMan.run_time + elapsed
 	var previous_best := SaveMan.best_time
-	SaveMan.note_win(elapsed)
-	hud.show_win(elapsed, previous_best)
+	SaveMan.note_win(total)
+	hud.show_win(total, previous_best)
