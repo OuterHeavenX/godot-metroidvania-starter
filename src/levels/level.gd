@@ -81,6 +81,7 @@ func _physics_process(delta: float) -> void:
 
 func _build_terrain() -> void:
 	var visual := TerrainVisual.new()
+	visual.theme = data.theme
 	visual.rects = data.platforms
 	add_child(visual)
 	for rect in data.platforms:
@@ -96,6 +97,7 @@ func _build_terrain() -> void:
 		add_child(body)
 	for rect in data.cracked:
 		var slab: StaticBody2D = CrackedFloorScript.new()
+		slab.theme = data.theme
 		slab.rect = rect
 		slab.position = rect.get_center()
 		add_child(slab)
@@ -103,91 +105,62 @@ func _build_terrain() -> void:
 
 class TerrainVisual extends Node2D:
 	var rects: Array = []
+	var theme := "cemetery"
 
 	func _draw() -> void:
 		for r in rects:
 			var rect: Rect2 = r
-			draw_rect(rect, Color("1a2033"))
+			if theme == "castle":
+				_castle_slab(rect)
+			else:
+				_graveyard_earth(rect)
 
-			draw_rect(Rect2(rect.position, Vector2(rect.size.x, 6)), Color("33406a"))
+	## Cut stone: block courses with a bright worn top edge.
+	func _castle_slab(rect: Rect2) -> void:
+		draw_rect(rect, Color("1d2440"))
+		var y := rect.position.y + 10.0
+		var row := 0
+		while y < rect.end.y:
+			draw_line(Vector2(rect.position.x, y), Vector2(rect.end.x, y),
+				Color("161c33"), 2.0)
+			var off := 0.0 if row % 2 == 0 else 34.0
+			var x := rect.position.x + off
+			while x < rect.end.x:
+				draw_line(Vector2(x, y), Vector2(x, minf(y + 22.0, rect.end.y)),
+					Color("161c33"), 2.0)
+				x += 68.0
+			y += 22.0
+			row += 1
+		draw_rect(Rect2(rect.position, Vector2(rect.size.x, 7)), Color("46548a"))
+		draw_rect(Rect2(rect.position + Vector2(0, 7), Vector2(rect.size.x, 3)),
+			Color("2b355c"))
+		draw_rect(rect, Color("0d1120"), false, 2.0)
 
-			draw_rect(rect, Color("0d1120"), false, 2.0)
+	## Turned earth under a lip of graveyard grass.
+	func _graveyard_earth(rect: Rect2) -> void:
+		draw_rect(rect, Color("1b1a26"))
+		var rng := RandomNumberGenerator.new()
+		rng.seed = int(absf(rect.position.x) * 7.0 + absf(rect.position.y) * 13.0) + 1
+		for i in range(int(rect.size.x / 46.0) + 1):
+			var p := rect.position + Vector2(rng.randf_range(0.0, rect.size.x),
+				rng.randf_range(14.0, maxf(16.0, rect.size.y - 4.0)))
+			draw_circle(p, rng.randf_range(1.5, 3.4), Color("241f2c"))
+		draw_rect(Rect2(rect.position, Vector2(rect.size.x, 6)), Color("2f4a34"))
+		draw_rect(Rect2(rect.position + Vector2(0, 6), Vector2(rect.size.x, 4)),
+			Color("23351f"))
+		# tufts along the lip
+		var gx := rect.position.x + 4.0
+		while gx < rect.end.x - 4.0:
+			var h := rng.randf_range(4.0, 11.0)
+			draw_line(Vector2(gx, rect.position.y + 1.0),
+				Vector2(gx + rng.randf_range(-3.0, 3.0), rect.position.y - h),
+				Color("3c5b3f"), 2.0)
+			gx += rng.randf_range(9.0, 22.0)
+		draw_rect(rect, Color("0d1120"), false, 2.0)
 
 
 func _build_background() -> void:
-
-	var sky_layer := CanvasLayer.new()
-	sky_layer.layer = -100
-	var sky := ColorRect.new()
-	sky.color = Color("0a0d18")
-	sky.set_anchors_preset(Control.PRESET_FULL_RECT)
-	sky_layer.add_child(sky)
-	add_child(sky_layer)
-
-	var parallax := ParallaxBackground.new()
-	add_child(parallax)
-
-	var far := ParallaxLayer.new()
-	far.motion_scale = Vector2(0.25, 0.25)
-	var far_draw := FarMountains.new()
-	far_draw.span = data.background_span
-	far_draw.position = Vector2(0, 120)
-	far.add_child(far_draw)
-	parallax.add_child(far)
-
-	var near := ParallaxLayer.new()
-	near.motion_scale = Vector2(0.5, 0.5)
-	var near_draw := NearHills.new()
-	near_draw.span = data.background_span
-	near_draw.position = Vector2(0, 200)
-	near.add_child(near_draw)
-	parallax.add_child(near)
-
-
-class FarMountains extends Node2D:
-	var span := Vector2(-400, 4400)
-
-	func _draw() -> void:
-		var rng := RandomNumberGenerator.new()
-		rng.seed = 1234
-		var pts := PackedVector2Array()
-		pts.append(Vector2(span.x, 400))
-		var x := span.x
-		while x < span.y:
-			pts.append(Vector2(x, -rng.randf_range(140.0, 330.0)))
-			x += rng.randf_range(240.0, 430.0)
-			pts.append(Vector2(x, -rng.randf_range(40.0, 130.0)))
-			x += rng.randf_range(240.0, 430.0)
-		pts.append(Vector2(span.y, 400))
-		draw_colored_polygon(pts, Color("121829"))
-
-		draw_circle(Vector2(2900, -420), 86, Color(0.88, 0.91, 0.96, 0.1))
-		draw_circle(Vector2(2900, -420), 66, Color("dfe6f5"))
-		draw_circle(Vector2(2878, -438), 12, Color("c9d2e6"))
-		draw_circle(Vector2(2922, -402), 8, Color("c9d2e6"))
-
-		var srng := RandomNumberGenerator.new()
-		srng.seed = 77
-		for i in range(90):
-			var p := Vector2(srng.randf_range(span.x + 100.0, span.y - 100.0),
-				srng.randf_range(-560.0, -40.0))
-			draw_circle(p, srng.randf_range(1.0, 2.2), Color(1, 1, 1, srng.randf_range(0.25, 0.8)))
-
-
-class NearHills extends Node2D:
-	var span := Vector2(-400, 4400)
-
-	func _draw() -> void:
-		var rng := RandomNumberGenerator.new()
-		rng.seed = 555
-		var pts := PackedVector2Array()
-		pts.append(Vector2(span.x, 400))
-		var x := span.x
-		while x < span.y:
-			pts.append(Vector2(x, -rng.randf_range(30.0, 130.0)))
-			x += rng.randf_range(300.0, 520.0)
-		pts.append(Vector2(span.y, 400))
-		draw_colored_polygon(pts, Color("1a2340"))
+	MVBackdrop.build(self, data.theme, data.background_span)
 
 
 func _make_hint(text: String, pos: Vector2) -> void:

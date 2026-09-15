@@ -60,17 +60,27 @@ func _physics_process(_delta: float) -> void:
 			t = 0
 		2:
 			if t > 2:
-				for i in range(5):
+				# Written from the constants, so retuning the fight does not
+				# silently turn these into assertions about nothing.
+				var to_phase_two: int = boss.MAX_HP - boss.PHASE_TWO_AT
+				for i in range(to_phase_two):
 					boss.call("take_hit", player.global_position)
-				check(int(boss.get("hp")) == boss.MAX_HP - 5,
+				check(int(boss.get("hp")) == boss.PHASE_TWO_AT,
 					"unguarded hits land (hp=%d)" % int(boss.get("hp")))
-				check(int(boss.get("phase")) == 2,
-					"dropped into phase two at half health")
+				check(int(boss.get("phase")) == 2, "dropped into phase two")
+				check(bool(boss.get("guarded")),
+					"phase two raises a fresh guard, so the pound is asked for twice")
 				phase = 3
 				t = 0
 		3:
 			if t > 2:
-				for i in range(5):
+				# The new guard has to be broken before anything lands again.
+				boss.call("take_hit", player.global_position)
+				check(int(boss.get("hp")) == boss.PHASE_TWO_AT,
+					"the second guard turns blades too")
+				boss.call("squash")
+				check(not bool(boss.get("guarded")), "pound breaks it a second time")
+				for i in range(boss.PHASE_TWO_AT):
 					boss.call("take_hit", player.global_position)
 				check(saw_defeat, "defeated signal fired")
 				check(bool(boss.get("dead")), "Warden is down")

@@ -7,13 +7,16 @@ extends MVSkeleton
 
 signal defeated
 
-const MAX_HP := 10
-const GUARD_BREAK_TIME := 3.2
-const PHASE_TWO_AT := 5
+const MAX_HP := 12
+## The guard does not come back on a timer. Breaking it opens the Warden for
+## the rest of the phase, and it raises a fresh one when phase two begins. On a
+## timer the fight was all-or-nothing -- kill it inside one window or lose,
+## because re-breaking cost more health than the player could spare.
+const PHASE_TWO_AT := 6
+const GUARD_STAGGER := 0.6
 const VISUAL_SCALE := 1.7
 
 var guarded := true
-var vulnerable_t := 0.0
 var phase := 1
 
 
@@ -26,19 +29,12 @@ func _ready() -> void:
 	cfg = cfg.duplicate()
 	cfg["hp"] = MAX_HP
 	cfg["speed"] = 70.0
-	cfg["melee_range"] = 118.0
-	cfg["attack_cd"] = 1.5
+	# The player's ATTACK_RANGE is 86. Anything longer means a band where the
+	# Warden can hit you and you cannot hit back, which is what made the fight
+	# unwinnable rather than hard.
+	cfg["melee_range"] = 84.0
+	cfg["attack_cd"] = 1.7
 	cfg["dmg"] = 1
-
-
-func _physics_process(delta: float) -> void:
-	if not dead and vulnerable_t > 0.0:
-		vulnerable_t -= delta
-		if vulnerable_t <= 0.0 and hp > 0:
-			guarded = true
-			JuiceMan.burst(global_position + Vector2(0, -60), Color(0.65, 0.72, 0.9),
-				10, 150.0, 0.4, 200.0, 3.0)
-	super._physics_process(delta)
 
 
 ## Ordinary hits ring off the guard. Only a pound opens it.
@@ -70,22 +66,29 @@ func take_hit(from_pos: Vector2) -> void:
 func squash() -> void:
 	if dead:
 		return
-	if guarded:
-		guarded = false
-		vulnerable_t = GUARD_BREAK_TIME
-		AudioMan.play("pound", -4.0, 0.85)
-		JuiceMan.shake(0.35)
-		JuiceMan.hit_stop(0.07)
-		JuiceMan.burst(global_position + Vector2(0, -60), Color(1.0, 0.85, 0.5),
-			20, 300.0, 0.6, 500.0, 5.0)
-	else:
-		vulnerable_t = GUARD_BREAK_TIME
+	if not guarded:
+		return
+	guarded = false
+	# Stagger it, so breaking the guard buys a real opening rather than just a
+	# state change.
+	state = "hurt"
+	state_t = GUARD_STAGGER
+	knock_v = 0.0
+	visual.play("hurt")
+	AudioMan.play("pound", -4.0, 0.85)
+	JuiceMan.shake(0.35)
+	JuiceMan.hit_stop(0.07)
+	JuiceMan.burst(global_position + Vector2(0, -60), Color(1.0, 0.85, 0.5),
+		20, 300.0, 0.6, 500.0, 5.0)
 
 
 func _enter_phase_two() -> void:
 	phase = 2
+	# A fresh guard: the mechanic gets asked for a second time, at a moment the
+	# player can see coming rather than on a hidden timer.
+	guarded = true
 	cfg["speed"] = 110.0
-	cfg["attack_cd"] = 0.95
+	cfg["attack_cd"] = 1.15
 	JuiceMan.shake(0.4)
 	JuiceMan.burst(global_position + Vector2(0, -60), Color(1.0, 0.45, 0.4),
 		24, 330.0, 0.7, 600.0, 5.0)

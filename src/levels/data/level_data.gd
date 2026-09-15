@@ -35,6 +35,9 @@ extends Resource
 @export var kill_y := 500.0
 
 @export_group("Dressing")
+## Picks the backdrop and how terrain is painted: "cemetery" or "castle".
+@export_enum("cemetery", "castle") var theme := "cemetery"
 @export var hints: Array[MVHint] = []
-## Horizontal span the parallax hills are drawn across, in layer space.
+## Horizontal span of the world the backdrop has to cover. Each parallax
+## layer scales this by its own motion scale to decide how wide to paint.
 @export var background_span := Vector2(-400, 4400)

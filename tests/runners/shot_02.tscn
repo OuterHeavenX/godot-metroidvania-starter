@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://src/levels/level_02.tscn" id="1_lvl"]
+[ext_resource type="Script" path="res://tests/shot.gd" id="2_shot"]
+
+[node name="ShotRoot" type="Node" unique_id=7200001]
+
+[node name="Level" parent="." instance=ExtResource("1_lvl") unique_id=7200002]
+
+[node name="Shot" type="Node" parent="." unique_id=7200003]
+script = ExtResource("2_shot")
