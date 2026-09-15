@@ -17,6 +17,8 @@ const HeartScript := preload("res://src/pickups/heart.gd")
 var player: MVPlayer
 var hud
 var respawning := false
+var elapsed := 0.0
+var finished := false
 
 
 func _ready() -> void:
@@ -38,11 +40,29 @@ func _ready() -> void:
 	cam.limit_bottom = int(data.camera_limits.end.y)
 	player.health_changed.connect(hud.set_hearts)
 	player.ability_gained.connect(hud.on_ability_gained)
+	player.ability_gained.connect(SaveMan.note_ability)
+	player.checkpoint_set.connect(SaveMan.note_checkpoint)
 	player.died.connect(_on_player_died)
 	hud.set_hearts(player.hp, player.MAX_HP)
+	_restore_progress()
 
 
-func _physics_process(_delta: float) -> void:
+## Only applied when the title screen asked to continue, so a level opened
+## directly -- by a test, or from the editor -- always starts clean.
+func _restore_progress() -> void:
+	if not SaveMan.resume_requested:
+		return
+	SaveMan.resume_requested = false
+	for ability_id in SaveMan.abilities:
+		player.gain_ability(ability_id)
+	if SaveMan.has_checkpoint:
+		player.set_checkpoint(SaveMan.checkpoint)
+		player.global_position = SaveMan.checkpoint
+
+
+func _physics_process(delta: float) -> void:
+	if not finished:
+		elapsed += delta
 	if player != null and not player.dead and player.global_position.y > data.kill_y:
 		player.kill()
 
@@ -210,4 +230,9 @@ func _on_player_died() -> void:
 
 
 func _on_won() -> void:
-	hud.show_win()
+	if finished:
+		return
+	finished = true
+	var previous_best := SaveMan.best_time
+	SaveMan.note_win(elapsed)
+	hud.show_win(elapsed, previous_best)

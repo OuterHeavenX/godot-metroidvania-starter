@@ -120,6 +120,13 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 22
 text = "RESTART RUN"
 
+[node name="Title2" type="Button" parent="Overlay/PausePanel/Panel/VBox" unique_id=785453208]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "QUIT TO TITLE"
+
 [node name="WinPanel" type="CenterContainer" parent="Overlay" unique_id=785453116]
 visible = false
 anchors_preset = 15
@@ -145,6 +152,13 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.75)
 theme_override_font_sizes/font_size = 18
 text = "The starter works — now build your world."
+horizontal_alignment = 1
+
+[node name="Time" type="Label" parent="Overlay/WinPanel/Panel/VBox" unique_id=785453209]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 0.9)
+theme_override_font_sizes/font_size = 22
+text = "Time"
 horizontal_alignment = 1
 
 [node name="Again" type="Button" parent="Overlay/WinPanel/Panel/VBox" unique_id=785453207]

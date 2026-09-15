@@ -7,13 +7,14 @@ config_version=5
 
 config/name="Metroidvania Starter"
 config/description="A tight 2D metroidvania starter: run, coyote-time jumps, wall-jump shaft, dash, and a double-jump ability gate."
-run/main_scene="res://src/levels/level_01.tscn"
+run/main_scene="res://src/ui/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
 AudioMan="*res://src/audio/audio_man.gd"
+SaveMan="*res://src/save/save_man.gd"
 JuiceMan="*res://src/juice/juice_man.gd"
 
 [display]

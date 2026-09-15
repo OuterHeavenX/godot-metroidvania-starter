@@ -44,7 +44,10 @@ src/                     All game code, one folder per feature
     goal.gd / goal.tscn
   world/
     cracked_floor.gd     Ground-pound breakable
+  save/
+    save_man.gd          Autoload: SaveMan (progress, best time)
   ui/
+    title.gd / title.tscn  Entry point: Continue / New Run
     hud.gd / hud.tscn
     hearts_bar.gd
     touch_controls.gd / touch_controls.tscn
@@ -75,9 +78,10 @@ tools/recover/           Scripts that rebuilt this source from the exported buil
 | Name     | Script                    |
 | -------- | ------------------------- |
 | AudioMan | `src/audio/audio_man.gd`  |
+| SaveMan  | `src/save/save_man.gd`    |
 | JuiceMan | `src/juice/juice_man.gd`  |
 
-Main scene: `src/levels/level_01.tscn`
+Main scene: `src/ui/title.tscn`
 
 ## Input map
 
@@ -212,6 +216,23 @@ over them, and the touch controls are hidden while a panel is up rather than
 left tappable underneath. The HUD runs with `process_mode = ALWAYS` so its
 buttons still work while the tree is paused — and so do the test runners, which
 would otherwise freeze the moment a test reaches the goal.
+
+## Progress and the title screen
+
+The game opens on `src/ui/title.tscn`. **Continue** only appears when there is
+something to resume, and the stats line shows best time, clears and abilities
+found.
+
+`SaveMan` persists abilities, the last checkpoint, completion and best time to
+`user://metroidvania_starter.cfg` — the same file AudioMan keeps the mute flag
+in. Both load before they save, so neither clobbers the other's section.
+
+One rule worth keeping: **a level never reads the save unless
+`SaveMan.resume_requested` is set**, which only the title screen's Continue
+does. A level opened directly — by a test, or from the editor — therefore
+always starts clean, whatever happens to be on disk. Without that, a stale save
+from an earlier run would quietly hand the player abilities mid-test and break
+suites that assert an ability is still locked.
 
 ## Level layout
 

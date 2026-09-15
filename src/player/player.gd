@@ -5,6 +5,7 @@ extends CharacterBody2D
 signal health_changed(hp: int, max_hp: int)
 signal died
 signal ability_gained(ability_id: String)
+signal checkpoint_set(pos: Vector2)
 
 const SPEED := 260.0
 const ACCEL := 2400.0
@@ -263,6 +264,7 @@ func _pound_impact() -> void:
 
 func set_checkpoint(pos: Vector2) -> void:
 	spawn_point = pos
+	checkpoint_set.emit(pos)
 
 
 ## Restores health. Returns false when nothing was healed, so a pickup can

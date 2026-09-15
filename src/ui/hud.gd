@@ -12,6 +12,8 @@ extends CanvasLayer
 @onready var resume_button: Button = $Overlay / PausePanel / Panel / VBox / Resume
 @onready var restart_button: Button = $Overlay / PausePanel / Panel / VBox / Restart
 @onready var again_button: Button = $Overlay / WinPanel / Panel / VBox / Again
+@onready var title_button: Button = $Overlay / PausePanel / Panel / VBox / Title2
+@onready var win_time: Label = $Overlay / WinPanel / Panel / VBox / Time
 
 var won := false
 
@@ -24,6 +26,7 @@ func _ready() -> void:
 	resume_button.pressed.connect(func () -> void: _set_pause(false))
 	restart_button.pressed.connect(restart)
 	again_button.pressed.connect(restart)
+	title_button.pressed.connect(quit_to_title)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -50,6 +53,12 @@ func _show_touch_controls(vis: bool) -> void:
 		return
 	for n in get_tree().get_nodes_in_group("touch_controls"):
 		(n as CanvasLayer).visible = vis
+
+
+func quit_to_title() -> void:
+	AudioMan.play("ui_click")
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://src/ui/title.tscn")
 
 
 func restart() -> void:
@@ -80,8 +89,18 @@ func on_ability_gained(ability_id: String) -> void:
 		pound_chip.add_theme_color_override("font_color", Color("ff9a3c"))
 
 
-func show_win() -> void:
+func show_win(seconds: float = 0.0, previous_best: float = 0.0) -> void:
 	won = true
+	if seconds > 0.0:
+		var line := "Time  %s" % SaveMan.format_time(seconds)
+		if previous_best > 0.0 and seconds < previous_best:
+			line += "   — new best"
+		elif previous_best > 0.0:
+			line += "   (best %s)" % SaveMan.format_time(previous_best)
+		win_time.text = line
+		win_time.visible = true
+	else:
+		win_time.visible = false
 	win_panel.visible = true
 	pause_panel.visible = false
 	_show_touch_controls(false)
