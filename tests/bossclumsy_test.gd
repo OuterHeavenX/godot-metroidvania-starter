@@ -165,7 +165,10 @@ func _act() -> void:
 		return
 
 	hold("pound", false)
-	var want: float = (150.0 if bool(decision["swinging"]) else 78.0) + aim
+	# Poke from the edge of your own reach -- the natural way to play it, and
+	# the reason a reach change has to be re-measured rather than assumed.
+	var reach: float = float(player.get("ATTACK_RANGE"))
+	var want: float = (reach + 66.0 if bool(decision["swinging"]) else reach - 12.0) + aim
 	var err: float = absf(dx) - want
 	if absf(err) > 8.0:
 		var go: float = toward if err > 0.0 else -toward

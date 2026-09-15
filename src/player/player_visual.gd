@@ -146,5 +146,11 @@ func _draw() -> void:
 	if player != null and player.attack_t > 0.0:
 		var a: float = player.attack_t / player.ATTACK_ACTIVE
 		var slash := Color(1.0, 0.92, 0.65, 0.9 * a)
-		draw_arc(Vector2(40, -6), 30, -1.15, 1.15, 18, slash, 3.0 + 6.0 * a)
-		draw_arc(Vector2(40, -6), 22, -0.9, 0.9, 14, Color(1, 1, 1, 0.5 * a), 2.0)
+		# Derived from the hitbox so the two cannot drift apart. These numbers
+		# put the arc tip on ATTACK_RANGE, its near edge back by the player's
+		# shoulder and its sweep at ATTACK_HALF_HEIGHT, so what you see is the
+		# box you actually hit with.
+		var r: float = player.ATTACK_RANGE
+		var mid := Vector2(r * 0.48, -6)
+		draw_arc(mid, r * 0.52, -1.7, 1.7, 24, slash, 3.0 + 6.0 * a)
+		draw_arc(mid, r * 0.38, -1.5, 1.5, 18, Color(1, 1, 1, 0.5 * a), 2.0)

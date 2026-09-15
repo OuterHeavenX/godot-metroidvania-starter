@@ -46,9 +46,13 @@ func _process(_delta: float) -> void:
 	match t:
 		60:
 			await _capture("guard_up")
-		70:
-			# A swing that rings off the guard.
-			boss.call("take_hit", player.global_position)
+		68:
+			# A real swing, so the slash arc is in the shot and can be checked
+			# against the hitbox it is supposed to represent.
+			player.set("facing", 1.0)
+			player.call("_do_attack")
+		69:
+			await _capture("swing")
 		74:
 			await _capture("blocked")
 		110:

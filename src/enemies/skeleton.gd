@@ -4,7 +4,7 @@ extends CharacterBody2D
 
 const CFG := {
 	"warrior": {"speed": 85.0, "hp": 2, "melee_range": 70.0, "attack_cd": 1.25, "patrol": true, "dmg": 1},
-	"spearman": {"speed": 62.0, "hp": 3, "melee_range": 104.0, "attack_cd": 1.6, "patrol": true, "dmg": 1},
+	"spearman": {"speed": 62.0, "hp": 3, "melee_range": 128.0, "attack_cd": 1.6, "patrol": true, "dmg": 1},
 	# shoot_range is bounded by what the camera shows. At zoom 1.4 the narrowest
 	# landscape view is 823 world px wide, and the camera's drag margin lets the
 	# player sit off-centre, leaving ~350px before an archer would be shooting

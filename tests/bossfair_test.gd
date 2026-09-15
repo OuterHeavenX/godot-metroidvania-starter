@@ -144,9 +144,10 @@ func _trade() -> void:
 	var it: Vector2 = (boss as Node2D).global_position
 	var dx: float = it.x - me.x
 	var swinging: bool = String(boss.get("state")) == "attack"
-	# Its reach is 84 and the player's is 86, so there is a thin band where you
-	# can hit it and it cannot hit you. Back out while it commits.
-	var want: float = 150.0 if swinging else 78.0
+	# The player outreaches the Warden, so there is a band where you can hit it
+	# and it cannot hit you. Back out while it commits.
+	var reach: float = float(player.get("ATTACK_RANGE"))
+	var want: float = reach + 66.0 if swinging else reach - 12.0
 	var err: float = absf(dx) - want
 	var toward: float = 1.0 if dx > 0.0 else -1.0
 

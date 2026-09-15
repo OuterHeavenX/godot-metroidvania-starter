@@ -38,10 +38,11 @@ func _ready() -> void:
 	cfg = cfg.duplicate()
 	cfg["hp"] = MAX_HP
 	cfg["speed"] = 70.0
-	# The player's ATTACK_RANGE is 86. Anything longer means a band where the
-	# Warden can hit you and you cannot hit back, which is what made the fight
-	# unwinnable rather than hard.
-	cfg["melee_range"] = 84.0
+	# Must stay inside the player's ATTACK_RANGE: anything longer is a band
+	# where the Warden can hit you and you cannot hit back, which is what made
+	# the fight unwinnable rather than hard. The margin is the fight -- too thin
+	# and spacing is unreadable, too wide and you can poke it to death for free.
+	cfg["melee_range"] = 96.0
 	cfg["attack_cd"] = 1.7
 	cfg["dmg"] = 1
 	# A shield you can see on the boss itself, so the state is readable without

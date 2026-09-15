@@ -21,7 +21,10 @@ const DASH_TIME := 0.16
 const DASH_COOLDOWN := 0.45
 const COYOTE_TIME := 0.12
 const JUMP_BUFFER := 0.14
-const ATTACK_RANGE := 86.0
+## The sword reached less far than half the enemy roster. At 86 the player was
+## third shortest of six -- shorter than a shielder -- which is what made
+## trading blows feel cramped.
+const ATTACK_RANGE := 112.0
 const ATTACK_HALF_HEIGHT := 58.0
 const ATTACK_COOLDOWN := 0.38
 const ATTACK_ACTIVE := 0.16
