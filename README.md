@@ -27,8 +27,14 @@ src/                     All game code, one folder per feature
     walker_visual.gd
     walker.tscn
   levels/
-    level_01.gd          Main scene
-    level_01.tscn
+    level.gd             Generic builder: turns an MVLevelData into an area
+    level_01.tscn        Main scene (player + HUD + touch controls + data)
+    level_01.tres        The area itself, as data
+    data/
+      level_data.gd      MVLevelData: terrain, actors, bounds, dressing
+      enemy_spawn.gd     MVEnemySpawn: position + kind
+      orb_spawn.gd       MVOrbSpawn: position + ability + tint
+      hint.gd            MVHint: text + position
   pickups/
     orb.gd / orb.tscn     Ability orbs
     heart.gd              Health pickup, script-built like cracked_floor
@@ -209,9 +215,16 @@ would otherwise freeze the moment a test reaches the goal.
 
 ## Level layout
 
-`src/levels/level_01.gd` builds the whole stage from const arrays — `PLATFORMS`,
-`CRACKED`, `ENEMIES`, `CHECKPOINTS` and the orb/goal positions — so new content
-is data, not new scenes.
+An area is a **resource**, not code. `src/levels/level.gd` is a generic builder
+that turns an `MVLevelData` into terrain, actors, camera bounds and signs;
+`src/levels/level_01.tres` is the area itself. A level scene is just a player,
+a HUD, the touch controls, and a `data` resource.
+
+So a new area is a new `.tres` — editable in Godot's inspector, and a readable
+text diff — rather than new GDScript. The fields are grouped: Terrain
+(`platforms`, `cracked`), Actors (`player_start`, `enemies`, `orbs`,
+`checkpoints`, `hearts`, `goal_position`), Bounds (`camera_limits`, `kill_y`)
+and Dressing (`hints`, `background_span`).
 
 The run goes: opening ground, the wall-jump shaft, the double-jump orb, the
 gated chamber, the ground-pound orb, and then the cracked span that drops you
