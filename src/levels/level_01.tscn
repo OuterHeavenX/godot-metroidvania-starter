@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/levels/level.gd" id="1_ykjos"]
+[ext_resource type="Resource" path="res://src/levels/level_01.tres" id="5_data"]
+[ext_resource type="PackedScene" path="res://src/player/player.tscn" id="2_ctm7v"]
+[ext_resource type="PackedScene" path="res://src/ui/hud.tscn" id="3_3xpop"]
+[ext_resource type="PackedScene" path="res://src/ui/touch_controls.tscn" id="4_m2l5o"]
+
+[node name="Level01" type="Node2D" unique_id=235011471]
+script = ExtResource("1_ykjos")
+data = ExtResource("5_data")
+
+[node name="Player" parent="." unique_id=761003943 instance=ExtResource("2_ctm7v")]
+position = Vector2(120, -120)
+
+[node name="HUD" parent="." unique_id=92677834 instance=ExtResource("3_3xpop")]
+
+[node name="TouchControls" parent="." unique_id=140596354 instance=ExtResource("4_m2l5o")]

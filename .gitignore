@@ -1,0 +1,34 @@
+# Godot 4 editor cache and imported resources — regenerated on open, never commit.
+.godot/
+/android/
+
+# Godot 3 leftovers, in case an old export is ever run here.
+.import/
+export.cfg
+
+# NOTE: export_presets.cfg is deliberately NOT ignored. The CI web export
+# reads the "Web" preset from it. Keep signing keys and passwords out of it.
+
+# Export output. docs/ is the published web build and IS tracked;
+# everything else an export writes goes here and is not.
+/build/
+/exports/
+*.exe
+*.x86_64
+*.apk
+*.aab
+*.dmg
+*.zip
+
+# Mono / C# (unused today, harmless if C# is ever added).
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS and editor noise.
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/

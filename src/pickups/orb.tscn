@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/pickups/orb.gd" id="1_r50pd"]
+
+[sub_resource type="CircleShape2D" id="pickup"]
+radius = 26.0
+
+[node name="Orb" type="Area2D" unique_id=435300330]
+script = ExtResource("1_r50pd")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=680522068]
+shape = SubResource("pickup")
