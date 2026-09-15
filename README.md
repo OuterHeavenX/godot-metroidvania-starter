@@ -150,6 +150,14 @@ It also sets `variant/thread_support=false`. A threaded web build needs
 cross-origin isolation headers, which GitHub Pages cannot send, so a threaded
 build will not boot there.
 
+### Hand-written scenes need explicit node ids
+
+If you author a `.tscn` by hand, give **every** `[node ...]` line a
+`unique_id=`. Without one Godot invents a random id per import, it lands in the
+exported `.scn`, and two clean builds of identical source then differ — which
+fails the `docs/` check with a message that points at a stale build rather than
+at the real cause. Scenes made in the editor get these for free.
+
 ### Pages configuration
 
 Settings → Pages → Build and deployment → Source: **Deploy from a branch**,

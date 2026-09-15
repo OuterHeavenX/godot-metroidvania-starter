@@ -9,40 +9,40 @@ size = Vector2(56, 138)
 [sub_resource type="RectangleShape2D" id="stomp"]
 size = Vector2(52, 16)
 
-[node name="Boss" type="CharacterBody2D"]
+[node name="Boss" type="CharacterBody2D" unique_id=6100001]
 collision_layer = 2
 collision_mask = 4
 script = ExtResource("1_54y0u")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=6100002]
 position = Vector2(0, -10)
 shape = SubResource("body")
 
-[node name="Visual" type="Node2D" parent="."]
+[node name="Visual" type="Node2D" parent="." unique_id=6100003]
 script = ExtResource("2_6yuhe")
 
-[node name="Sensors" type="Node2D" parent="."]
+[node name="Sensors" type="Node2D" parent="." unique_id=6100004]
 
-[node name="WallCheck" type="RayCast2D" parent="Sensors"]
+[node name="WallCheck" type="RayCast2D" parent="Sensors" unique_id=6100005]
 position = Vector2(32, -48)
 target_position = Vector2(12, 0)
 collision_mask = 4
 
-[node name="FloorCheck" type="RayCast2D" parent="Sensors"]
+[node name="FloorCheck" type="RayCast2D" parent="Sensors" unique_id=6100006]
 position = Vector2(32, -16)
 target_position = Vector2(12, 78)
 collision_mask = 4
 
-[node name="Stompbox" type="Area2D" parent="."]
+[node name="Stompbox" type="Area2D" parent="." unique_id=6100007]
 collision_layer = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Stompbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Stompbox" unique_id=6100008]
 position = Vector2(0, -86)
 shape = SubResource("stomp")
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=6100009]
 collision_layer = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=6100010]
 position = Vector2(0, -10)
 shape = SubResource("body")
