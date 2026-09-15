@@ -102,9 +102,8 @@ position = Vector2(5660, -600)
 [sub_resource type="Resource" id="Resource_oxb6c"]
 script = ExtResource("2_sp832")
 text = "THE WARDEN
-its guard turns blades —
-pound to break it"
-position = Vector2(5900, -190)
+its guard turns blades"
+position = Vector2(5850, -130)
 
 [sub_resource type="Resource" id="Resource_clprv"]
 script = ExtResource("3_b00yd")

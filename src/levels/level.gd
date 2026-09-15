@@ -30,9 +30,10 @@ func _ready() -> void:
 	_build_background()
 	_build_terrain()
 	_build_hints()
-	_spawn_actors()
+	# The boss wires itself to the HUD as it spawns, so resolve these first.
 	player = $Player
 	hud = $HUD
+	_spawn_actors()
 	if data.player_start != Vector2.ZERO:
 		player.position = data.player_start
 	var cam: Camera2D = player.get_node("Camera2D")
@@ -206,6 +207,13 @@ func _spawn_actors() -> void:
 	if data.has_boss:
 		var boss := BossScene.instantiate()
 		boss.position = data.boss_position
+		# Connect before adding: the boss announces itself from _ready(), which
+		# runs the moment it enters the tree.
+		boss.engaged.connect(hud.boss_engaged)
+		boss.hp_changed.connect(hud.boss_hp)
+		boss.guard_changed.connect(hud.boss_guard)
+		boss.blocked.connect(hud.boss_blocked)
+		boss.defeated.connect(hud.boss_defeated)
 		add_child(boss)
 		goal.lock()
 		boss.defeated.connect(goal.unlock)

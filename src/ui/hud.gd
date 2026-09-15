@@ -17,6 +17,7 @@ extends CanvasLayer
 @onready var key_hint: Label = $Hint
 @onready var win_title: Label = $Overlay / WinPanel / Panel / VBox / Title
 @onready var win_sub: Label = $Overlay / WinPanel / Panel / VBox / Sub
+@onready var boss_bar = $BossBar
 
 var won := false
 var _next_level := ""
@@ -130,6 +131,26 @@ func _refresh_mute_label() -> void:
 
 func set_hearts(hp: int, max_hp: int) -> void:
 	hearts.set_values(hp, max_hp)
+
+
+func boss_engaged(who: String, hp: int, max_hp: int, guarded: bool) -> void:
+	boss_bar.engage(who, hp, max_hp, guarded)
+
+
+func boss_hp(hp: int, max_hp: int) -> void:
+	boss_bar.set_hp(hp, max_hp)
+
+
+func boss_guard(guarded: bool) -> void:
+	boss_bar.set_guard(guarded)
+
+
+func boss_blocked() -> void:
+	boss_bar.blocked()
+
+
+func boss_defeated() -> void:
+	boss_bar.dismiss()
 
 
 func on_ability_gained(ability_id: String) -> void:

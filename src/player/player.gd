@@ -28,6 +28,10 @@ const ATTACK_ACTIVE := 0.16
 const POUND_WINDUP := 0.12
 const POUND_FALL_SPEED := 1350.0
 const POUND_IMPACT_RADIUS := 95.0
+## How far above or below the player's feet an enemy's origin may sit and still
+## be caught. Wide enough for anything standing on the same floor, tight enough
+## that a pound does not reach a storey up.
+const POUND_IMPACT_BAND := 120.0
 const POUND_BREAK_RADIUS := 110.0
 const MAX_HP := 5
 const FALL_GRAVITY_MULT := 1.35
@@ -106,8 +110,15 @@ func _do_attack() -> void:
 		var to: Vector2 = foe.global_position - global_position
 		# Forward-biased box. The old signf(to.x) == facing test dropped any foe
 		# standing exactly on the player's own x, where signf returns 0.
+		#
+		# Horizontal reach, not a radius. An enemy's origin is the centre of its
+		# collision box, so a tall enemy carries its origin further above the
+		# floor and a radius silently shortens the swing: against the Warden,
+		# 39px up, ATTACK_RANGE 86 became 77 -- less than its own 84 reach, so
+		# it outranged the player even after its reach was cut to match.
+		# Enemies test their own reach horizontally; this now matches.
 		if absf(to.y) < ATTACK_HALF_HEIGHT and to.x * facing > -ATTACK_BACK_GRACE \
-				and to.length() < ATTACK_RANGE:
+				and absf(to.x) < ATTACK_RANGE:
 			foe.take_hit(global_position)
 
 
@@ -252,7 +263,13 @@ func _pound_impact() -> void:
 		var foe := e as Node2D
 		if foe == null or not foe.has_method("squash"):
 			continue
-		if foe.global_position.distance_to(feet) < POUND_IMPACT_RADIUS:
+		# Horizontal reach plus a band, not a circle around the enemy's origin.
+		# An origin sits at the centre of the collision box, so a taller enemy
+		# has its origin further above the floor and a circle quietly shrinks
+		# the reach: the Warden is 138 tall, which left only 45px either side of
+		# its body -- the guard was near enough impossible to break.
+		var off := foe.global_position - feet
+		if absf(off.x) < POUND_IMPACT_RADIUS and absf(off.y) < POUND_IMPACT_BAND:
 			foe.squash()
 	for c in get_tree().get_nodes_in_group("cracked"):
 		var slab := c as Node2D
