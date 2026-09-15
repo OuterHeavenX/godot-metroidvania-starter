@@ -2,6 +2,11 @@ extends Node2D
 
 
 const CELL := 128
+## Where the sprite sits relative to the body. The art fills the 128px cell to
+## its last row, so the feet render at +63.5 from the cell centre; the collision
+## box (34x84 at y-6) puts the floor at +36. -27.5 lands one on the other --
+## at the old -12 the feet sank 15px through the ground.
+const SPRITE_Y := -27.5
 const ANIMS := {
 	"warrior": {"idle": 7, "walk": 7, "attack1": 5, "attack2": 6, "hurt": 2, "dead": 4},
 	"spearman": {"idle": 7, "walk": 7, "attack1": 4, "attack2": 4, "hurt": 3, "dead": 4},
@@ -53,7 +58,7 @@ func _build() -> void:
 	sprite = AnimatedSprite2D.new()
 	sprite.name = "Sprite"
 	sprite.sprite_frames = frames
-	sprite.position = Vector2(0, -12)
+	sprite.position = Vector2(0, SPRITE_Y)
 	sprite.play("idle")
 	add_child(sprite)
 	_ready_done = true
