@@ -18,6 +18,7 @@ extends CanvasLayer
 @onready var win_title: Label = $Overlay / WinPanel / Panel / VBox / Title
 @onready var win_sub: Label = $Overlay / WinPanel / Panel / VBox / Sub
 @onready var boss_bar = $BossBar
+@onready var build_label: Label = $Build
 
 var won := false
 var _next_level := ""
@@ -25,6 +26,7 @@ var _next_level := ""
 
 func _ready() -> void:
 	add_to_group("hud")
+	build_label.text = MVBuild.label()
 	_refresh_mute_label()
 	mute_button.pressed.connect(_on_mute_pressed)
 	pause_button.pressed.connect(func () -> void: _set_pause(true))

@@ -153,29 +153,35 @@ jobs:
           done
           ls -la build/web
 
-      - name: Check docs/ matches the source
+      - name: Check the published builds match the source
         if: steps.detect.outputs.has_source == 'true'
-        # Pages serves docs/ off the branch, so a stale docs/ means the live
-        # game silently lags the code. The export is byte-reproducible, so a
+        # Pages serves a committed export off the branch, and this repository
+        # keeps one at the root and one in docs/. Which of the two Pages is
+        # configured to serve has been ambiguous, and a stale copy means the
+        # live game silently lags the code -- three rounds of bug reports were
+        # spent on a build that did not contain the fix. Both are checked, so
+        # whichever is live is current. The export is byte-reproducible, so a
         # fresh build can be compared against what is committed.
         run: |
           set -euo pipefail
           stale=0
-          for f in build/web/*; do
-            name=$(basename "$f")
-            if [ ! -f "docs/$name" ]; then
-              echo "::error::docs/$name is missing from the committed build"
-              stale=1
-            elif ! cmp -s "$f" "docs/$name"; then
-              echo "::error::docs/$name does not match a fresh export"
-              stale=1
-            fi
+          for dir in . docs; do
+            for f in build/web/*; do
+              name=$(basename "$f")
+              if [ ! -f "$dir/$name" ]; then
+                echo "::error::$dir/$name is missing from the committed build"
+                stale=1
+              elif ! cmp -s "$f" "$dir/$name"; then
+                echo "::error::$dir/$name does not match a fresh export"
+                stale=1
+              fi
+            done
           done
           if [ "$stale" -ne 0 ]; then
-            echo "::error::The committed build in docs/ is out of date. Rebuild it with:"
+            echo "::error::A committed build is out of date. Rebuild both with:"
             echo "  godot --headless --import ."
             echo "  godot --headless --export-release Web build/web/index.html"
-            echo "  cp build/web/* docs/"
+            echo "  cp build/web/* docs/ && cp build/web/* ."
             exit 1
           fi
-          echo "docs/ matches the source"
+          echo "the root and docs/ builds both match the source"

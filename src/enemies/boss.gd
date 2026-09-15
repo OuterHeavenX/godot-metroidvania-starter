@@ -13,13 +13,15 @@ signal hp_changed(hp: int, max_hp: int)
 signal guard_changed(guarded: bool)
 signal blocked
 
-const MAX_HP := 12
+const MAX_HP := 10
 ## The guard does not come back on a timer. Breaking it opens the Warden for
 ## the rest of the phase, and it raises a fresh one when phase two begins. On a
 ## timer the fight was all-or-nothing -- kill it inside one window or lose,
 ## because re-breaking cost more health than the player could spare.
-const PHASE_TWO_AT := 6
-const GUARD_STAGGER := 0.6
+const PHASE_TWO_AT := 5
+## Breaking the guard is the hard part of the fight, so it has to buy a real
+## opening. At 0.6 the Warden was swinging again before the player had landed.
+const GUARD_STAGGER := 1.4
 const VISUAL_SCALE := 1.7
 
 var guarded := true
@@ -95,6 +97,11 @@ func squash() -> void:
 	state_t = GUARD_STAGGER
 	knock_v = 0.0
 	visual.play("hurt")
+	# Breaking the guard pays for itself. It is the hard half of the fight and
+	# reaching one costs height, position and usually a hit on the way in.
+	var p := _player()
+	if p != null and p.has_method("heal"):
+		p.call("heal", 1)
 	AudioMan.play("pound", -4.0, 0.85)
 	JuiceMan.shake(0.35)
 	JuiceMan.hit_stop(0.07)

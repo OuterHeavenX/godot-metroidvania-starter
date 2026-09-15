@@ -27,7 +27,7 @@ func _on_body(body: Node2D) -> void:
 		return
 	p.gain_ability(ability_id)
 	AudioMan.play("orb_pickup")
-	JuiceMan.burst(global_position, tint, 18, 240.0, 0.6, 200.0, 5.0)
+	JuiceMan.burst(global_position, tint, 18, 240.0, 0.7, 200.0, 5.0, "magic")
 	JuiceMan.shake(0.2)
 	queue_free()
 

@@ -211,8 +211,15 @@ func _on_hurt(body: Node2D) -> void:
 	if dead:
 		return
 	var p := body as MVPlayer
-	if p != null:
-		p.take_damage(int(cfg["dmg"]), global_position)
+	if p == null:
+		return
+	# A slam in progress does not get punished for touching what it is slamming.
+	# The pound is the taught answer to a guard, and reaching one means passing
+	# through the enemy: charging the player for that made the intended solution
+	# cost a heart every time it was used.
+	if p.is_pounding():
+		return
+	p.take_damage(int(cfg["dmg"]), global_position)
 
 
 ## True when a blow lands on the shield rather than the skeleton.
@@ -269,5 +276,6 @@ func die() -> void:
 	$Stompbox.set_deferred("monitoring", false)
 	velocity = Vector2.ZERO
 	visual.play("dead")
+	visual.dissolve()
 	await get_tree().create_timer(0.55).timeout
 	queue_free()

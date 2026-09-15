@@ -64,6 +64,47 @@ func _build() -> void:
 	_ready_done = true
 
 
+static var _dissolve_shader: Shader
+static var _noise_tex: Texture2D
+
+
+func dissolve() -> void:
+	## Burn-away death effect: noise-eroded dissolve with a glowing edge.
+	if _dissolve_shader == null:
+		_dissolve_shader = Shader.new()
+		_dissolve_shader.code = """
+shader_type canvas_item;
+uniform sampler2D noise_tex;
+uniform float amount = 0.0;
+void fragment() {
+	vec4 c = texture(TEXTURE, UV);
+	float n = texture(noise_tex, UV * vec2(2.0, 2.0)).r;
+	if (n < amount) discard;
+	float edge = smoothstep(amount, amount + 0.18, n);
+	c.rgb = mix(vec3(1.0, 0.55, 0.15) * 1.6, c.rgb, edge);
+	COLOR = c;
+}
+"""
+	if _noise_tex == null:
+		var nz := FastNoiseLite.new()
+		nz.seed = 4242
+		nz.frequency = 0.06
+		var img := Image.create(64, 64, false, Image.FORMAT_R8)
+		for y in range(64):
+			for x in range(64):
+				var v := nz.get_noise_2d(float(x), float(y)) * 0.5 + 0.5
+				img.set_pixel(x, y, Color(v, 0, 0))
+		_noise_tex = ImageTexture.create_from_image(img)
+	var mat := ShaderMaterial.new()
+	mat.shader = _dissolve_shader
+	mat.set_shader_parameter("noise_tex", _noise_tex)
+	mat.set_shader_parameter("amount", 0.0)
+	sprite.material = mat
+	var tw := create_tween()
+	tw.tween_method(func(v: float) -> void: mat.set_shader_parameter("amount", v),
+		0.0, 1.05, 0.5)
+
+
 func play(anim_name: String) -> void:
 	if sprite != null and sprite.sprite_frames.has_animation(anim_name):
 		if sprite.animation != anim_name:

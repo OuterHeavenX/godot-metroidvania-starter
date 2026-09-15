@@ -19,6 +19,7 @@ func _ready() -> void:
 	mute_button.pressed.connect(_on_mute)
 	_refresh_mute()
 	stats.text = _stats_line()
+	($Build as Label).text = MVBuild.label()
 	apply_touch_layout(DisplayServer.is_touchscreen_available())
 	if continue_button.visible:
 		continue_button.grab_focus()

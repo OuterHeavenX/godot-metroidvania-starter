@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tests/bossclumsy_test.gd" id="2_t"]
+
+[node name="Root" type="Node" unique_id=7500001]
+
+[node name="Test" type="Node" parent="." unique_id=7500003]
+script = ExtResource("2_t")

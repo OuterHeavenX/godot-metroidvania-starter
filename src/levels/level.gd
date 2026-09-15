@@ -20,6 +20,7 @@ var hud
 var respawning := false
 var elapsed := 0.0
 var finished := false
+var _orbs: Array = []
 
 
 func _ready() -> void:
@@ -48,6 +49,19 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 	hud.set_hearts(player.hp, player.MAX_HP)
 	_restore_progress()
+	_build_atmosphere()
+
+
+## v10 visual pass: dark ambient, lights, torch posts, grass, god rays,
+## embers, foreground and vignette. The themed parallax background comes
+## from MVBackdrop in _build_background; this adds everything else.
+func _build_atmosphere() -> void:
+	var torches: Array = []
+	torches.append_array(data.checkpoints)
+	torches.append(data.goal_position)
+	if data.has_boss:
+		torches.append(data.boss_position)
+	MVAtmosphere.build_v11(self, player, _orbs, torches, data.platforms)
 
 
 func scene_path() -> String:
@@ -172,6 +186,8 @@ func _make_hint(text: String, pos: Vector2) -> void:
 	hint.add_theme_color_override("font_color", Color("cfe0ff"))
 	hint.add_theme_color_override("font_outline_color", Color("0a0d18"))
 	hint.add_theme_constant_override("outline_size", 8)
+	# the dark ambient dims in-world labels; boost back to readable
+	hint.modulate = Color(1.75, 1.75, 1.75)
 	add_child(hint)
 
 
@@ -192,6 +208,7 @@ func _spawn_actors() -> void:
 		orb.ability_id = spawn.ability_id
 		orb.tint = spawn.tint
 		add_child(orb)
+		_orbs.append(orb)
 	for hpos in data.hearts:
 		var heart: Area2D = HeartScript.new()
 		heart.position = hpos

@@ -69,6 +69,18 @@ offset_bottom = 156.0
 mouse_filter = 2
 script = ExtResource("3_bossbar")
 
+[node name="Build" type="Label" parent="." unique_id=1275702021]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -26.0
+offset_right = 260.0
+offset_bottom = -8.0
+theme_override_colors/font_color = Color(1, 1, 1, 0.22)
+theme_override_font_sizes/font_size = 12
+text = "v0"
+
 [node name="MuteButton" type="Button" parent="." unique_id=1275702013]
 modulate = Color(1, 1, 1, 0.75)
 anchors_preset = 1
