@@ -5,11 +5,12 @@ extends CharacterBody2D
 const CFG := {
 	"warrior": {"speed": 85.0, "hp": 2, "melee_range": 70.0, "attack_cd": 1.25, "patrol": true, "dmg": 1},
 	"spearman": {"speed": 62.0, "hp": 3, "melee_range": 128.0, "attack_cd": 1.6, "patrol": true, "dmg": 1},
-	# shoot_range is bounded by what the camera shows. At zoom 1.4 the narrowest
-	# landscape view is 823 world px wide, and the camera's drag margin lets the
-	# player sit off-centre, leaving ~350px before an archer would be shooting
-	# from off screen. Re-check this if the camera zoom changes.
-	"archer": {"speed": 0.0, "hp": 2, "shoot_range": 340.0, "shoot_cd": 2.4, "patrol": false, "dmg": 1},
+	# shoot_range is bounded by what the camera shows. At zoom 1.54 the narrowest
+	# landscape view is 748 world px wide, and the camera's drag margin lets the
+	# player sit off-centre, leaving ~310px before an archer would be shooting
+	# from off screen. Re-check this if the camera zoom changes -- it went 1.4 ->
+	# 1.54 to frame the character larger, and this came down with it.
+	"archer": {"speed": 0.0, "hp": 2, "shoot_range": 305.0, "shoot_cd": 2.4, "patrol": false, "dmg": 1},
 	# Holds a shield toward you: blades from the front are turned aside, so come
 	# round it or pound it. Slow enough that going round is realistic.
 	"shielder": {"speed": 48.0, "hp": 3, "melee_range": 96.0, "attack_cd": 1.9,

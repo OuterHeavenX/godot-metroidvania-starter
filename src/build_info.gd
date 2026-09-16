@@ -8,8 +8,8 @@ extends RefCounted
 ## was no way for either side of the conversation to tell which export was
 ## actually live. Bump this whenever the published build changes, and the
 ## answer is on screen.
-const VERSION := "v13"
-const NOTE := "longer sword"
+const VERSION := "v14"
+const NOTE := "no boss · closer camera"
 
 
 static func label() -> String:

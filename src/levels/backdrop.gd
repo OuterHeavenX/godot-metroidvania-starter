@@ -23,11 +23,11 @@ static func build(host: Node2D, theme: String, span: Vector2) -> void:
 	host.add_child(parallax)
 	for spec in _layers(theme):
 		var layer := ParallaxLayer.new()
-		# Parallax horizontally, but anchor the near layers vertically. With a
-		# y-scale below 1 their baseline drifts with the camera, which put the
-		# headstones below the ground line. Sky keeps a small y-scale so it
-		# still floats.
-		layer.motion_scale = Vector2(spec["scale"], spec["yscale"])
+		# Parallax horizontally only. Any y-scale below 1 makes a layer slide up
+		# the screen as the camera rises: on the near layers it put the
+		# headstones below the ground line, and on the far ones the whole
+		# backdrop rode up with the player's jump.
+		layer.motion_scale = Vector2(spec["scale"], 1.0)
 		var painter: Node2D = spec["painter"]
 		# A layer scrolls at motion_scale, so the slice of its local space the
 		# camera ever sees is the world span times that scale. Painting across
@@ -64,14 +64,14 @@ static func _sky(theme: String) -> Control:
 static func _layers(theme: String) -> Array:
 	if theme == "castle":
 		return [
-			{"scale": 0.18, "yscale": 0.25, "y": -40.0, "painter": CastleDepth.new()},
-			{"scale": 0.38, "yscale": 1.0, "y": 0.0, "painter": CastleWall.new()},
-			{"scale": 0.62, "yscale": 1.0, "y": 0.0, "painter": CastleColumns.new()},
+			{"scale": 0.18, "y": -40.0, "painter": CastleDepth.new()},
+			{"scale": 0.38, "y": 0.0, "painter": CastleWall.new()},
+			{"scale": 0.62, "y": 0.0, "painter": CastleColumns.new()},
 		]
 	return [
-		{"scale": 0.16, "yscale": 0.12, "y": -60.0, "painter": CemeteryRidge.new()},
-		{"scale": 0.34, "yscale": 1.0, "y": 0.0, "painter": CemeteryChapel.new()},
-		{"scale": 0.60, "yscale": 1.0, "y": 0.0, "painter": CemeteryGraves.new()},
+		{"scale": 0.16, "y": -60.0, "painter": CemeteryRidge.new()},
+		{"scale": 0.34, "y": 0.0, "painter": CemeteryChapel.new()},
+		{"scale": 0.60, "y": 0.0, "painter": CemeteryGraves.new()},
 	]
 
 

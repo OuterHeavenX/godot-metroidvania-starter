@@ -21,7 +21,7 @@ const NEED_WINS := 7             # of 8
 
 ## The test owns the level rather than living inside it, so an attempt can be
 ## torn down and rebuilt without taking the test down with it.
-const LevelScene := preload("res://src/levels/level_01.tscn")
+const LevelScene := preload("res://tests/fixtures/warden_arena.tscn")
 
 var level: Node = null
 var rng := RandomNumberGenerator.new()

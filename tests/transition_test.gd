@@ -42,10 +42,10 @@ func _physics_process(_delta: float) -> void:
 
 	match phase:
 		0:
-			var boss := get_tree().get_first_node_in_group("boss")
-			check(boss != null, "the Warden is here")
-			if boss != null:
-				boss.call("die")
+			# The cemetery no longer holds a boss, so nothing gates the exit --
+			# reaching it is the whole of clearing the area.
+			check(get_tree().get_first_node_in_group("boss") == null,
+				"no boss in the cemetery")
 			phase = 1
 			t = 0
 		1:

@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/levels/level.gd" id="1_lvl"]
+[ext_resource type="Resource" path="res://tests/fixtures/warden_arena.tres" id="5_data"]
+[ext_resource type="PackedScene" path="res://src/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://src/ui/hud.tscn" id="3_hud"]
+
+[node name="WardenArena" type="Node2D" unique_id=7600001]
+script = ExtResource("1_lvl")
+data = ExtResource("5_data")
+
+[node name="Player" parent="." unique_id=7600002 instance=ExtResource("2_player")]
+position = Vector2(5860, -20)
+
+[node name="HUD" parent="." unique_id=7600003 instance=ExtResource("3_hud")]

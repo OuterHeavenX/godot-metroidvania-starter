@@ -61,7 +61,7 @@ static func build_v11(level: Node2D, player: Node2D, orbs: Array,
 	]
 	for fd in fog_defs:
 		var pl := ParallaxLayer.new()
-		pl.motion_scale = Vector2(0.62, 0.85)
+		pl.motion_scale = Vector2(0.62, 1.0)
 		var band := FogBand.new()
 		band.band_seed = int(fd[0])
 		band.base_y = float(fd[1])
@@ -181,18 +181,22 @@ static func _build_parallax(atmo: MVAtmosphere) -> void:
 	atmo.add_child(parallax)
 
 	var far := ParallaxLayer.new()
-	far.motion_scale = Vector2(0.12, 0.12)
+	# Horizontal parallax only. A y motion scale below 1 makes a layer scroll
+	# slower than the world vertically, so it slides up the screen every time the
+	# camera rises -- the backdrop visibly rode up with the player's jump. Depth
+	# comes from the x scale; the y axis stays locked to the world.
+	far.motion_scale = Vector2(0.12, 1.0)
 	far.add_child(MountainsFar.new())
 	parallax.add_child(far)
 
 	var forest := ParallaxLayer.new()
 	forest.name = "ForestLayer"
-	forest.motion_scale = Vector2(0.3, 0.3)
+	forest.motion_scale = Vector2(0.3, 1.0)
 	forest.add_child(DeadForest.new())
 	parallax.add_child(forest)
 
 	var ruins := ParallaxLayer.new()
-	ruins.motion_scale = Vector2(0.5, 0.5)
+	ruins.motion_scale = Vector2(0.5, 1.0)
 	ruins.add_child(Ruins.new())
 	parallax.add_child(ruins)
 
@@ -204,7 +208,7 @@ static func _build_parallax(atmo: MVAtmosphere) -> void:
 	]
 	for fd in fog_defs:
 		var pl := ParallaxLayer.new()
-		pl.motion_scale = Vector2(0.62, 0.85)
+		pl.motion_scale = Vector2(0.62, 1.0)
 		var band := FogBand.new()
 		band.band_seed = int(fd[0])
 		band.base_y = float(fd[1])

@@ -192,11 +192,13 @@ func _physics_process(_delta: float) -> void:
 					"pounded through the span into the arena")
 				var p: Vector2 = player.global_position
 				check(p.y > -200.0, "dropped into the arena (x=%.0f y=%.0f)" % [p.x, p.y])
-				var boss := get_tree().get_first_node_in_group("boss")
-				check(boss != null, "the Warden is waiting in the arena")
+				# The arena is the last stretch of the cemetery now rather than a
+				# boss room, so the exit stands in it and is open on arrival.
 				var goal := get_tree().get_first_node_in_group("goal")
-				check(goal != null and bool(goal.get("locked")),
-					"the way out stays locked until the Warden falls")
+				check(goal != null and not bool(goal.get("locked")),
+					"the way out is open")
+				check(goal != null and absf((goal as Node2D).global_position.x - p.x) < 700.0,
+					"the exit is in the arena you just dropped into")
 				_finish()
 		return
 
