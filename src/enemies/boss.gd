@@ -1,139 +1,84 @@
 class_name MVBoss
 extends MVSkeleton
 
-## The Warden. A warrior skeleton scaled up, with a guard that ordinary attacks
-## bounce off: the only way through it is a ground pound, which is the ability
-## the Undercroft spends its whole length teaching.
-
 signal defeated
-## The HUD listens to these. The fight was unreadable without them: an ordinary
-## hit and one that rang off the guard looked near enough the same.
-signal engaged(who: String, hp: int, max_hp: int, guarded: bool)
-signal hp_changed(hp: int, max_hp: int)
 signal guard_changed(guarded: bool)
-signal blocked
-
-const MAX_HP := 10
-## The guard does not come back on a timer. Breaking it opens the Warden for
-## the rest of the phase, and it raises a fresh one when phase two begins. On a
-## timer the fight was all-or-nothing -- kill it inside one window or lose,
-## because re-breaking cost more health than the player could spare.
-const PHASE_TWO_AT := 5
-## Breaking the guard is the hard part of the fight, so it has to buy a real
+signal phase_changed(phase: int)
+const MAX_HP := 9
+const PHASE_TWO_AT := 4
+## Breaking the guard is the hard half of the fight, so it has to buy a real
 ## opening. At 0.6 the Warden was swinging again before the player had landed.
-const GUARD_STAGGER := 1.4
+## Retuned after the combat refactor: the same numbers no longer bought the
+## same fight, which is what bossclumsy is for.
+const GUARD_STAGGER := 1.7
 const VISUAL_SCALE := 1.7
-
 var guarded := true
 var phase := 1
 var guard_visual: GuardAura = null
-
 
 func _ready() -> void:
 	kind = "warrior"
 	super._ready()
 	add_to_group("boss")
-	hp = MAX_HP
+	combat.configure(MAX_HP)
+	visual_scale = VISUAL_SCALE
 	visual.scale = Vector2(VISUAL_SCALE, VISUAL_SCALE)
-	cfg = cfg.duplicate()
-	cfg["hp"] = MAX_HP
-	cfg["speed"] = 70.0
-	# Must stay inside the player's ATTACK_RANGE: anything longer is a band
-	# where the Warden can hit you and you cannot hit back, which is what made
-	# the fight unwinnable rather than hard. The margin is the fight -- too thin
-	# and spacing is unreadable, too wide and you can poke it to death for free.
-	cfg["melee_range"] = 96.0
-	cfg["attack_cd"] = 1.7
-	cfg["dmg"] = 1
-	# A shield you can see on the boss itself, so the state is readable without
+	# A shield you can see on the boss itself, so the guard is readable without
 	# looking away from the fight.
 	guard_visual = GuardAura.new()
 	guard_visual.z_index = 1
 	add_child(guard_visual)
-	engaged.emit("THE WARDEN", hp, MAX_HP, guarded)
+	cfg = cfg.duplicate()
+	cfg.merge({"hp": MAX_HP, "speed": 70.0, "melee_range": 96.0, "attack_cd": 1.7, "dmg": 1}, true)
 
-
-## Ordinary hits ring off the guard. Only a pound opens it.
-func take_hit(from_pos: Vector2) -> void:
+func _damage_policy(hit: MVDamage) -> int:
 	if dead:
-		return
-	if guarded:
-		hit_flash = 0.12
-		AudioMan.play("hit_enemy", -10.0, 0.55)
-		JuiceMan.burst(global_position + Vector2(0, -60), Color(0.75, 0.8, 0.95),
-			6, 120.0, 0.3, 160.0, 3.0)
-		blocked.emit()
-		if guard_visual != null:
-			guard_visual.clang(global_position.x - from_pos.x)
-		return
-	hp -= 1
-	hp_changed.emit(hp, MAX_HP)
-	hit_flash = 0.16
-	AudioMan.play("hit_enemy", -2.0, randf_range(0.85, 1.0))
-	var away: float = signf(global_position.x - from_pos.x)
-	knock_v = (away if away != 0.0 else dir) * 120.0
-	if hp <= PHASE_TWO_AT and phase == 1:
-		_enter_phase_two()
-	if hp <= 0:
-		die()
-		return
-	state = "hurt"
+		return 0
+	if hit.kind == MVDamage.Kind.IMPACT:
+		return MVCombat.STAGGER if guarded else 0
+	return 0 if guarded else hit.amount
+
+func _on_damaged(hit: MVDamage) -> void:
+	super._on_damaged(hit)
+	knock_v = MVCombat.knockback(hit.origin, global_position, dir, 120.0, 0.0).x
 	state_t = 0.2
-	visual.play("hurt")
+	if hp > 0 and hp <= PHASE_TWO_AT and phase == 1:
+		_enter_phase_two()
 
-
-## A ground pound (or a stomp) breaks the guard instead of killing outright.
-func squash() -> void:
-	if dead:
-		return
-	if not guarded:
-		return
+func _on_staggered(_hit: MVDamage) -> void:
 	guarded = false
-	guard_changed.emit(false)
+	guard_changed.emit(guarded)
 	if guard_visual != null:
 		guard_visual.shatter()
-	# Stagger it, so breaking the guard buys a real opening rather than just a
-	# state change.
-	state = "hurt"
-	state_t = GUARD_STAGGER
-	knock_v = 0.0
-	visual.play("hurt")
 	# Breaking the guard pays for itself. It is the hard half of the fight and
 	# reaching one costs height, position and usually a hit on the way in.
 	var p := _player()
 	if p != null and p.has_method("heal"):
 		p.call("heal", 1)
-	AudioMan.play("pound", -4.0, 0.85)
-	JuiceMan.shake(0.35)
-	JuiceMan.hit_stop(0.07)
-	JuiceMan.burst(global_position + Vector2(0, -60), Color(1.0, 0.85, 0.5),
-		20, 300.0, 0.6, 500.0, 5.0)
-
+	state = "hurt"
+	state_t = GUARD_STAGGER
+	knock_v = 0.0
+	feedback.emit(&"animation", {"name": "hurt"})
+	feedback.emit(&"guard_break", {})
 
 func _enter_phase_two() -> void:
 	phase = 2
-	# A fresh guard: the mechanic gets asked for a second time, at a moment the
-	# player can see coming rather than on a hidden timer.
 	guarded = true
 	guard_changed.emit(true)
 	if guard_visual != null:
 		guard_visual.raise()
 	cfg["speed"] = 110.0
 	cfg["attack_cd"] = 1.15
-	JuiceMan.shake(0.4)
-	JuiceMan.burst(global_position + Vector2(0, -60), Color(1.0, 0.45, 0.4),
-		24, 330.0, 0.7, 600.0, 5.0)
-
+	guard_changed.emit(guarded)
+	phase_changed.emit(phase)
+	feedback.emit(&"phase_two", {})
 
 func die() -> void:
 	if dead:
 		return
-	defeated.emit()
-	JuiceMan.shake(0.7)
-	JuiceMan.hit_stop(0.12)
-	JuiceMan.burst(global_position + Vector2(0, -60), Color(1.0, 0.8, 0.45),
-		34, 420.0, 0.9, 700.0, 7.0)
+	feedback.emit(&"boss_death", {})
 	super.die()
+	defeated.emit()
 
 
 ## The guard, drawn on the boss. Ordinary blows spark off it; a pound shatters

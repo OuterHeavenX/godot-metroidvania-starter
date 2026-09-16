@@ -15,9 +15,12 @@ extends Node
 const REACTION := 11             # ~180ms before it reacts to anything
 const AIM_ERROR := 28.0          # px it can be off its intended spot
 const FUMBLE := 0.12             # share of inputs simply missed
-const SEEDS := [1, 2, 3, 4, 5, 6, 7, 8]
-const MAX_FRAMES := 4200         # 70s per attempt
-const NEED_WINS := 7             # of 8
+## Six rather than eight: this has to finish inside the 120s verify.py allows a
+## suite, and rebuilding the arena per attempt is most of the cost. Still a win
+## rate over several seeds rather than one lucky run.
+const SEEDS := [1, 2, 3, 4, 5, 6]
+const MAX_FRAMES := 2700         # 45s per attempt; wins take 14-19s
+const NEED_WINS := 5             # of 6
 
 ## The test owns the level rather than living inside it, so an attempt can be
 ## torn down and rebuilt without taking the test down with it.

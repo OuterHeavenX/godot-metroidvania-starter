@@ -1,5 +1,8 @@
 # Metroidvania Starter
 
+Architecture: [implemented systems and recovery rules](ARCHITECTURE.md).
+Design: [mechanics audit and future proposals](DESIGN_AUDIT.md).
+
 A tight 2D metroidvania starter built in Godot 4.7: run, coyote-time jumps,
 wall-jump shaft, dash, ground pound, and a double-jump ability gate.
 
@@ -26,7 +29,8 @@ src/                     All game code, one folder per feature
     skeleton.gd / skeleton.tscn   warrior, spearman, archer
     skeleton_visual.gd
     arrow.gd
-    boss.gd / boss.tscn           The Warden (extends MVSkeleton)
+    boss.gd / boss.tscn           The Warden (extends MVSkeleton; not in a
+                                  shipped level -- see tests/fixtures)
   levels/
     level.gd             Generic builder: turns an MVLevelData into an area
     level_01.tscn/.tres  Area one: the opening run and the Undercroft
@@ -68,6 +72,17 @@ tests/
   save_test.gd           Progress written and restored across a reload
   title_test.gd          Continue and stats appear only with progress
   boss_test.gd           Guard, pound-to-break, phase two, goal unlock
+  bossfight_test.gd      The fight with real cooldowns; teleports into position,
+                         so regression evidence only
+  bossfair_test.gd       The same fight using nothing but key presses
+  bossclumsy_test.gd     ...and with a human's handicaps: 180ms reaction,
+                         imprecise aim, dropped inputs, swept over six seeds
+                         for a win rate rather than one lucky run
+  architecture_test.gd   Save migration, world persistence, encounter resets
+  combat_contract_test.gd  Active windows, one hit per target, buffering
+  visual_test.gd         Atmosphere and presentation wiring
+  fixtures/              Levels that exist only for tests -- warden_arena.tres
+                         holds the Warden, which no shipped level does
   touch_test.gd          Phone layout
   area2_test.gd          Area two builds; shielder and charger behaviour
   transition_test.gd     Clearing an area hands you to the next with abilities
@@ -75,7 +90,10 @@ tests/
   script_check.gd        Loads every script so a syntax error fails the build
   runners/               Scenes CI launches with --scene
 
-docs/                    Committed web build — this is the live site
+docs/                    Committed web build
+index.*                  The same build at the repo root; GitHub Pages has been
+                         configured to serve each of these at different times,
+                         so both are published and CI checks both are current
 tools/recover/           Scripts that rebuilt this source from the exported build
 .github/workflows/       Export and deploy to GitHub Pages
 ```
@@ -188,24 +206,25 @@ no diff.
 
 ## Camera framing
 
-The camera lives on the player (`src/player/player.tscn`) at `zoom = 1.4`, with
+The camera lives on the player (`src/player/player.tscn`) at `zoom = 1.54`, with
 position smoothing and a horizontal drag margin already set.
 
 Stretch is `canvas_items` with aspect `expand` and no explicit viewport size, so
 the base is Godot's default 1152x648. On anything 16:9 or wider the height stays
 648 canvas units and the width grows with the aspect; on narrower windows the
-width holds at 1152 and the height grows. So at zoom 1.4:
+width holds at 1152 and the height grows. So at zoom 1.54:
 
-- vertical view is 463 world px, putting the 44px character at ~9.5% of screen
+- vertical view is 421 world px, putting the 44px character at ~10.5% of screen
   height, which is the usual range for a 2D platformer;
-- horizontal view is at least 823 world px, so half-width is at least 411px.
+- horizontal view is at least 748 world px, so half-width is at least 374px.
 
 The camera also leads by `CAM_LOOKAHEAD` (60px) in the facing direction. That
 is not only feel: the drag margin makes the camera *trail* the player by about
 62px, showing where you have been rather than where you are going. Leading by
 roughly the same distance re-centres the view, which widens the worst-case
-sightline from 349px to about 409px — so the lookahead buys headroom for enemy
-reach rather than spending it.
+sightline from 312px to about 372px — so the lookahead buys headroom for enemy
+reach rather than spending it. The archer's 305px shoot_range is sized against
+that figure, so both move together when the zoom changes.
 
 That half-width is the constraint on enemy reach. An archer's `shoot_range`
 must stay inside it or arrows arrive from off screen — with the camera's drag
@@ -234,20 +253,20 @@ would otherwise freeze the moment a test reaches the goal.
 
 ## Progress and the title screen
 
-The game opens on `src/ui/title.tscn`. **Continue** only appears when there is
-something to resume, and the stats line shows best time, clears and abilities
-found.
+Continue restores a versioned run snapshot: abilities, area, checkpoint, current
+area time and permanent world changes. Defeated enemies, collected rewards and
+opened floors stay resolved after death or reload. Surviving enemies reset to
+full health at their authored positions. The player returns healed at the checkpoint.
 
-`SaveMan` persists abilities, the last checkpoint, completion and best time to
-`user://metroidvania_starter.cfg` — the same file AudioMan keeps the mute flag
-in. Both load before they save, so neither clobbers the other's section.
+`SaveMan` owns atomic config writes and a backup, including mute changes from
+AudioMan. Legacy saves migrate; newer save versions are protected from overwrite.
+The current-area clock is flushed periodically and on focus loss/scene exit.
+New Run clears progress while keeping records. Pause-menu restart retries from
+the checkpoint; PLAY AGAIN after a final clear starts a new run in area one.
 
-One rule worth keeping: **a level never reads the save unless
-`SaveMan.resume_requested` is set**, which only the title screen's Continue
-does. A level opened directly — by a test, or from the editor — therefore
-always starts clean, whatever happens to be on disk. Without that, a stale save
-from an earlier run would quietly hand the player abilities mid-test and break
-suites that assert an ability is still locked.
+A directly opened level starts a fresh run. Continue and inter-area transitions
+explicitly set `SaveMan.resume_requested`. Tests run with isolated save folders.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full persistence contract.
 
 ## Areas and transitions
 
@@ -292,19 +311,13 @@ second track is not something I could author.
 
 ## The Warden
 
-The Undercroft ends in an arena rather than the old sealed vault. `MVBoss`
-extends `MVSkeleton`, so it reuses the movement, sensors and animation, and
-overrides what differs:
+The Warden uses the shared Combat component with an actor-specific guard policy.
+Ordinary slashes are blocked while guarded. A stomp or ground pound breaks the
+guard until the next phase. At half health it raises its guard again and moves
+faster. Its exit unlocks on defeat and stays unlocked on Continue.
 
-- **Guarded by default** — ordinary attacks ring off it and deal nothing.
-- **A ground pound breaks the guard**, opening a 3.2s window. That is
-  deliberate: the pound is the ability the Undercroft spends its whole length
-  teaching, so the fight asks for what the region taught.
-- **Phase two at half health** — faster, and a shorter attack cooldown.
-- The goal sits in the arena but starts **locked and dimmed**, and only unlocks
-  when the Warden falls.
-
-Set `has_boss` and `boss_position` on a level resource to use it elsewhere.
+The boss display shows health, phase and guard status. Attack indicators expose
+windup timing. Encounter construction and retries live in `MVEncounterController`.
 
 ### A note on test clocks
 
@@ -314,15 +327,15 @@ the change. Tests that assert physics state should run on `_physics_process`.
 
 ## Level layout
 
-An area is a **resource**, not code. `src/levels/level.gd` is a generic builder
+An area is a **resource**, not code. Persistent placements have stable authored IDs. `src/levels/level.gd` is a generic builder
 that turns an `MVLevelData` into terrain, actors, camera bounds and signs;
 `src/levels/level_01.tres` is the area itself. A level scene is just a player,
 a HUD, the touch controls, and a `data` resource.
 
 So a new area is a new `.tres` — editable in Godot's inspector, and a readable
 text diff — rather than new GDScript. The fields are grouped: Terrain
-(`platforms`, `cracked`), Actors (`player_start`, `enemies`, `orbs`,
-`checkpoints`, `hearts`, `goal_position`), Bounds (`camera_limits`, `kill_y`)
+(`platforms`, `breakables`), Actors (`player_start`, `enemies`, `orbs`,
+`checkpoint_spawns`, `heart_spawns`, `goal_position`), Bounds (`camera_limits`, `kill_y`)
 and Dressing (`hints`, `background_span`).
 
 The run goes: opening ground, the wall-jump shaft, the double-jump orb, the

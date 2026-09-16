@@ -49,6 +49,10 @@ func act(action: String, down: bool) -> void:
 func place(pos: Vector2) -> void:
 	player.global_position = pos
 	player.velocity = Vector2.ZERO
+	# Geometry is the subject of this suite; combat is covered separately.
+	player.invuln = 999.0
+	player.buffer = 0.0
+	player.coyote = 0.0
 
 
 func _physics_process(_delta: float) -> void:

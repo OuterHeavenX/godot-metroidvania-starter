@@ -5,53 +5,66 @@
 [ext_resource type="Script" path="res://src/levels/data/orb_spawn.gd" id="3_b00yd"]
 [ext_resource type="Script" path="res://src/levels/data/level_data.gd" id="4_i04je"]
 
+[ext_resource type="Script" path="res://src/levels/data/world_spawn.gd" id="world_spawn"]
+
 [sub_resource type="Resource" id="Resource_mey8e"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_mey8e"
 position = Vector2(800, -60)
 
 [sub_resource type="Resource" id="Resource_rnsal"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_rnsal"
 position = Vector2(2950, -60)
 kind = "spearman"
 
 [sub_resource type="Resource" id="Resource_6desd"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_6desd"
 position = Vector2(3250, -60)
 kind = "archer"
 
 [sub_resource type="Resource" id="Resource_58wfm"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_58wfm"
 position = Vector2(3150, 260)
 
 [sub_resource type="Resource" id="Resource_1ygyi"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_1ygyi"
 position = Vector2(3520, 260)
 
 [sub_resource type="Resource" id="Resource_8bn5a"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_8bn5a"
 position = Vector2(4000, 260)
 kind = "spearman"
 
 [sub_resource type="Resource" id="Resource_t2t8p"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_t2t8p"
 position = Vector2(4320, 260)
 
 [sub_resource type="Resource" id="Resource_lb2of"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_lb2of"
 position = Vector2(4760, -160)
 kind = "archer"
 
 [sub_resource type="Resource" id="Resource_wt7q8"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_wt7q8"
 position = Vector2(5800, -520)
 
 [sub_resource type="Resource" id="Resource_jkr67"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_jkr67"
 position = Vector2(5960, -520)
 kind = "spearman"
 
 [sub_resource type="Resource" id="Resource_4omty"]
 script = ExtResource("1_oxb6c")
+persistence_id = "Resource_4omty"
 position = Vector2(6300, -520)
 kind = "archer"
 
@@ -101,25 +114,113 @@ position = Vector2(5660, -600)
 
 [sub_resource type="Resource" id="Resource_clprv"]
 script = ExtResource("3_b00yd")
+persistence_id = "Resource_clprv"
 position = Vector2(2510, -380)
 
 [sub_resource type="Resource" id="Resource_ttfqg"]
 script = ExtResource("3_b00yd")
+persistence_id = "Resource_ttfqg"
 position = Vector2(2870, -180)
 ability_id = "ground_pound"
 tint = Color(1, 0.6039216, 0.23529412, 1)
 
+[sub_resource type="Resource" id="cracked_01"]
+script = ExtResource("world_spawn")
+persistence_id = "cracked_01"
+position = Vector2(3180, -15)
+size = Vector2(136, 30)
+
+[sub_resource type="Resource" id="cracked_02"]
+script = ExtResource("world_spawn")
+persistence_id = "cracked_02"
+position = Vector2(6100, -475)
+size = Vector2(100, 30)
+
+[sub_resource type="Resource" id="hearts_01"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_01"
+position = Vector2(1200, -130)
+
+[sub_resource type="Resource" id="hearts_02"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_02"
+position = Vector2(2600, -360)
+
+[sub_resource type="Resource" id="hearts_03"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_03"
+position = Vector2(3600, 260)
+
+[sub_resource type="Resource" id="hearts_04"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_04"
+position = Vector2(4080, 260)
+
+[sub_resource type="Resource" id="hearts_05"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_05"
+position = Vector2(5760, -520)
+
+[sub_resource type="Resource" id="hearts_06"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_06"
+position = Vector2(5900, -20)
+
+[sub_resource type="Resource" id="hearts_07"]
+script = ExtResource("world_spawn")
+persistence_id = "hearts_07"
+position = Vector2(6420, -20)
+
+[sub_resource type="Resource" id="checkpoints_01"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_01"
+position = Vector2(1780, -60)
+
+[sub_resource type="Resource" id="checkpoints_02"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_02"
+position = Vector2(2440, -360)
+
+[sub_resource type="Resource" id="checkpoints_03"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_03"
+position = Vector2(2900, -60)
+
+[sub_resource type="Resource" id="checkpoints_04"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_04"
+position = Vector2(3380, 260)
+
+[sub_resource type="Resource" id="checkpoints_05"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_05"
+position = Vector2(3960, 260)
+
+[sub_resource type="Resource" id="checkpoints_06"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_06"
+position = Vector2(4660, -160)
+
+[sub_resource type="Resource" id="checkpoints_07"]
+script = ExtResource("world_spawn")
+persistence_id = "checkpoints_07"
+position = Vector2(5700, -520)
+
 [resource]
 script = ExtResource("4_i04je")
+area_id = "hollowmere"
 level_name = "Hollowmere Cemetery"
 next_level = "res://src/levels/level_02.tscn"
 platforms = Array[Rect2]([Rect2(0, 0, 560, 160), Rect2(680, 0, 380, 160), Rect2(1140, -70, 260, 230), Rect2(1460, -140, 260, 300), Rect2(1720, 0, 520, 160), Rect2(1900, -320, 70, 320), Rect2(2170, -320, 70, 320), Rect2(2360, -300, 300, 60), Rect2(2760, -560, 360, 60), Rect2(2760, 0, 360, 160), Rect2(3240, 0, 280, 160), Rect2(2820, -120, 100, 32), Rect2(3080, 160, 40, 160), Rect2(3240, 160, 40, 70), Rect2(3080, 320, 200, 40), Rect2(3280, 320, 420, 40), Rect2(3520, 140, 180, 20), Rect2(3900, 320, 590, 40), Rect2(4150, -40, 70, 270), Rect2(4420, -40, 70, 360), Rect2(4620, -100, 220, 30), Rect2(4980, -220, 130, 26), Rect2(5240, -340, 130, 26), Rect2(5500, -460, 130, 26), Rect2(5630, -460, 420, 160), Rect2(6150, -460, 350, 160), Rect2(5800, 40, 700, 40), Rect2(5760, -300, 40, 340), Rect2(6500, -300, 40, 340)])
-cracked = Array[Rect2]([Rect2(3112, -30, 136, 30), Rect2(6050, -490, 100, 30)])
+breakables = Array[ExtResource("world_spawn")]([SubResource("cracked_01"), SubResource("cracked_02")])
+
 player_start = Vector2(120, -120)
 enemies = Array[ExtResource("1_oxb6c")]([SubResource("Resource_mey8e"), SubResource("Resource_rnsal"), SubResource("Resource_6desd"), SubResource("Resource_58wfm"), SubResource("Resource_1ygyi"), SubResource("Resource_8bn5a"), SubResource("Resource_t2t8p"), SubResource("Resource_lb2of"), SubResource("Resource_wt7q8"), SubResource("Resource_jkr67"), SubResource("Resource_4omty")])
 orbs = Array[ExtResource("3_b00yd")]([SubResource("Resource_clprv"), SubResource("Resource_ttfqg")])
-checkpoints = Array[Vector2]([Vector2(1780, -60), Vector2(2440, -360), Vector2(2900, -60), Vector2(3380, 260), Vector2(3960, 260), Vector2(4660, -160), Vector2(5700, -520)])
-hearts = Array[Vector2]([Vector2(1200, -130), Vector2(2600, -360), Vector2(3600, 260), Vector2(4080, 260), Vector2(5760, -520), Vector2(5900, -20), Vector2(6420, -20)])
+checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("checkpoints_01"), SubResource("checkpoints_02"), SubResource("checkpoints_03"), SubResource("checkpoints_04"), SubResource("checkpoints_05"), SubResource("checkpoints_06"), SubResource("checkpoints_07")])
+
+heart_spawns = Array[ExtResource("world_spawn")]([SubResource("hearts_01"), SubResource("hearts_02"), SubResource("hearts_03"), SubResource("hearts_04"), SubResource("hearts_05"), SubResource("hearts_06"), SubResource("hearts_07")])
+
 goal_position = Vector2(6320, -20)
 has_boss = false
 hints = Array[ExtResource("2_sp832")]([SubResource("Resource_sp832"), SubResource("Resource_kurx8"), SubResource("Resource_qvahq"), SubResource("Resource_pbfgv"), SubResource("Resource_jw77q"), SubResource("Resource_4th2k"), SubResource("Resource_hsic5")])

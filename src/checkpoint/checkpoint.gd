@@ -1,10 +1,15 @@
 extends Area2D
 
+signal claimed
+
 
 var activated := false
 
 
 func _ready() -> void:
+	var effects := preload("res://src/presentation/world_feedback.gd").new()
+	effects.kind = "checkpoint"
+	add_child(effects)
 	add_to_group("checkpoint")
 	collision_layer = 0
 	collision_mask = 1
@@ -15,22 +20,14 @@ func _on_body(body: Node2D) -> void:
 	if activated:
 		return
 	var p := body as MVPlayer
-	if p != null:
+	if p != null and not p.dead:
 		activated = true
+		claimed.emit()
 		p.set_checkpoint(global_position + Vector2(0, -10))
 		# Dying was the only way to recover health, which does not hold up over
 		# a level this long. Reaching a new checkpoint restores it.
-		var healed: bool = p.heal(p.MAX_HP)
-		AudioMan.play("checkpoint")
-		if healed:
-			JuiceMan.burst(p.global_position, Color(0.95, 0.35, 0.45),
-				14, 170.0, 0.5, 220.0, 4.0)
-		JuiceMan.burst(global_position + Vector2(0, -48), Color(0.95, 0.75, 0.3),
-			12, 200.0, 0.5, 300.0, 4.0)
+		p.heal(p.MAX_HP)
 		queue_redraw()
-		var tw := create_tween()
-		tw.tween_property(self, "scale", Vector2(1.25, 1.25), 0.12)
-		tw.tween_property(self, "scale", Vector2.ONE, 0.14)
 
 
 func _draw() -> void:

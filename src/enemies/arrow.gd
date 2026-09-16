@@ -1,6 +1,8 @@
 class_name MVArrow
 extends Area2D
 
+signal impacted
+
 
 var dir := 1.0
 var speed := 520.0
@@ -18,6 +20,10 @@ func setup(p_dir: float, pos: Vector2) -> void:
 
 
 func _ready() -> void:
+	var effects := preload("res://src/presentation/world_feedback.gd").new()
+	effects.kind = "arrow"
+	add_child(effects)
+	add_to_group("projectile")
 	collision_layer = 0
 	collision_mask = 1 | 4
 	monitoring = true
@@ -48,8 +54,8 @@ func _on_body(body: Node2D) -> void:
 		return
 	var p := body as MVPlayer
 	if p != null:
-		p.take_damage(1, global_position)
+		MVDamage.deliver(p, MVDamage.new(1, global_position, MVDamage.Kind.CONTACT))
 	else:
-		JuiceMan.burst(global_position, Color(0.7, 0.65, 0.5), 6, 140.0, 0.3, 400.0, 3.0)
+		impacted.emit()
 	dead = true
 	queue_free()

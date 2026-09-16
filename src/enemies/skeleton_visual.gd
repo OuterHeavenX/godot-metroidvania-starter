@@ -119,8 +119,33 @@ func _process(_delta: float) -> void:
 	if not _ready_done:
 		return
 
+	queue_redraw()
 	var e := get_parent()
 	if e != null and "hit_flash" in e and e.hit_flash > 0.0:
 		sprite.modulate = Color(2.4, 1.1, 1.1)
 	else:
 		sprite.modulate = Color.WHITE
+
+
+func _draw() -> void:
+	var actor := get_parent() as MVSkeleton
+	if actor == null or actor.dead:
+		return
+	# A shape and a filling bar communicate timing without relying on colour.
+	if actor.state not in ["attack", "windup", "shoot"]:
+		return
+	var duration := 0.55
+	var trigger := 0.55 * 0.55
+	if actor.state == "windup":
+		duration = MVSkeleton.CHARGE_WINDUP
+		trigger = 0.0
+	elif actor.state == "shoot":
+		duration = 0.95
+		trigger = 0.45
+	var progress := clampf((duration - actor.state_t) / (duration - trigger), 0.0, 1.0)
+	var y := -88.0
+	var tint := Color("ffd28a")
+	draw_line(Vector2(0, y - 16), Vector2(0, y - 7), tint, 3.0)
+	draw_circle(Vector2(0, y - 2), 2.0, tint)
+	draw_rect(Rect2(-18, y + 5, 36, 4), Color("171b2d"))
+	draw_rect(Rect2(-18, y + 5, 36 * progress, 4), tint)

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="MVLevelData" format=3]
 
 [ext_resource type="Script" path="res://src/levels/data/hint.gd" id="2_hint"]
+[ext_resource type="Script" path="res://src/levels/data/world_spawn.gd" id="world_spawn"]
 [ext_resource type="Script" path="res://src/levels/data/level_data.gd" id="4_data"]
 
 [sub_resource type="Resource" id="Resource_hint"]
@@ -9,13 +10,30 @@ text = "THE WARDEN
 its guard turns blades"
 position = Vector2(5850, -130)
 
+[sub_resource type="Resource" id="arena_checkpoint_01"]
+script = ExtResource("world_spawn")
+persistence_id = "arena_checkpoint_01"
+position = Vector2(5860, -20)
+
+[sub_resource type="Resource" id="arena_heart_01"]
+script = ExtResource("world_spawn")
+persistence_id = "arena_heart_01"
+position = Vector2(5900, -20)
+
+[sub_resource type="Resource" id="arena_heart_02"]
+script = ExtResource("world_spawn")
+persistence_id = "arena_heart_02"
+position = Vector2(6420, -20)
+
 [resource]
 script = ExtResource("4_data")
+area_id = "warden_arena"
+boss_id = "warden"
 level_name = "The Warden's Arena"
 platforms = Array[Rect2]([Rect2(5630, -460, 420, 160), Rect2(6150, -460, 350, 160), Rect2(5800, 40, 700, 40), Rect2(5760, -300, 40, 340), Rect2(6500, -300, 40, 340)])
 player_start = Vector2(5860, -20)
-checkpoints = Array[Vector2]([Vector2(5860, -20)])
-hearts = Array[Vector2]([Vector2(5900, -20), Vector2(6420, -20)])
+checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("arena_checkpoint_01")])
+heart_spawns = Array[ExtResource("world_spawn")]([SubResource("arena_heart_01"), SubResource("arena_heart_02")])
 goal_position = Vector2(5880, -20)
 has_boss = true
 boss_position = Vector2(6320, -20)

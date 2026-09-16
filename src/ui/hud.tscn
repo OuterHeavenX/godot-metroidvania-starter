@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://src/ui/hud.gd" id="1_5jomq"]
 [ext_resource type="Script" path="res://src/ui/hearts_bar.gd" id="2_0bris"]
-[ext_resource type="Script" path="res://src/ui/boss_bar.gd" id="3_bossbar"]
 
 [node name="HUD" type="CanvasLayer" unique_id=1489288897]
 layer = 5
@@ -57,17 +56,6 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.45)
 theme_override_font_sizes/font_size = 15
 text = "A/D or arrows: move · Space: jump · Shift: dash · S/↓: pound · Esc: pause · Stomp enemies · Find the orbs"
 horizontal_alignment = 1
-
-[node name="BossBar" type="Control" parent="." unique_id=1275702020]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -215.0
-offset_top = 96.0
-offset_right = 215.0
-offset_bottom = 156.0
-mouse_filter = 2
-script = ExtResource("3_bossbar")
 
 [node name="Build" type="Label" parent="." unique_id=1275702021]
 anchors_preset = 2
