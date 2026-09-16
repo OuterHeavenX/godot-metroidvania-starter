@@ -15,6 +15,7 @@ static func build(host: Node2D, theme: String, span: Vector2) -> void:
 	if not THEMES.has(theme):
 		theme = "cemetery"
 	var sky_layer := CanvasLayer.new()
+	sky_layer.name = "SkyLayer"
 	sky_layer.layer = -100
 	sky_layer.add_child(_sky(theme))
 	host.add_child(sky_layer)

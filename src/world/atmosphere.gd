@@ -12,7 +12,6 @@ extends Node2D
 
 var _t := 0.0
 var _sky: SkyDraw
-var _foreground: Foreground
 var _torches: Array = [] # each: {light: PointLight2D, base: float, phase: float}
 var _lantern: PointLight2D
 var _lantern_base := 1.5
@@ -104,9 +103,6 @@ func _process(delta: float) -> void:
 	if _sky != null:
 		_sky.t = _t
 		_sky.queue_redraw()
-	if _foreground != null:
-		_foreground.t = _t
-		_foreground.queue_redraw()
 	for tc in _torches:
 		var d: Dictionary = tc
 		var l := d["light"] as PointLight2D
@@ -122,6 +118,9 @@ func _process(delta: float) -> void:
 
 static func _build_sky_layer(atmo: MVAtmosphere) -> void:
 	var layer := CanvasLayer.new()
+	# Named so the parallax test can tell a deliberate screen-pinned layer from
+	# one that drifted in by accident.
+	layer.name = "SkyLayer"
 	layer.layer = -100
 	atmo.add_child(layer)
 	# vertical night gradient
@@ -640,9 +639,6 @@ func _build_camera_fx(player: Node2D) -> void:
 	var cam := player.get_node("Camera2D") as Camera2D
 	if cam == null:
 		return
-	_foreground = Foreground.new()
-	_foreground.name = "Foreground"
-	cam.add_child(_foreground)
 	# embers rising through the air
 	var embers := CPUParticles2D.new()
 	embers.amount = 26
@@ -699,58 +695,11 @@ func _build_camera_fx(player: Node2D) -> void:
 	leaves.emitting = true
 
 
-class Foreground extends Node2D:
-	## Dark silhouette layer pinned to the camera: grass tufts along the
-	## bottom edge, hanging chains from the top. Sells the depth.
-	var t := 0.0
-
-	func _ready() -> void:
-		z_index = 90
-
-	func _draw() -> void:
-		var rng := RandomNumberGenerator.new()
-		rng.seed = 99
-		# back row of grass: slightly lighter
-		_grass_row(rng, 240.0, 300.0, Color("0a1224"), 0.0)
-		# front row: near-black, taller
-		_grass_row(rng, 290.0, 324.0, Color("04070f"), 3.7)
-		# hanging chains from the top
-		for cx in [150.0, 520.0, 905.0]:
-			_chain(cx + rng.randf_range(-30.0, 30.0), rng.randf_range(150.0, 260.0))
-
-	func _grass_row(rng: RandomNumberGenerator, y0: float, y1: float,
-			col: Color, phase: float) -> void:
-		var x := -576.0
-		while x < 576.0:
-			var sway := sin(t * 1.1 + phase + x * 0.01) * 6.0
-			var blades := 5 + rng.randi_range(0, 3)
-			for b in range(blades):
-				var bx := x + rng.randf_range(-16.0, 16.0)
-				var h := rng.randf_range(y1 - y0 - 30.0, y1 - y0 + 26.0)
-				var wdt := rng.randf_range(4.0, 8.0)
-				draw_colored_polygon(PackedVector2Array([
-					Vector2(bx - wdt, y1), Vector2(bx + wdt, y1),
-					Vector2(bx + sway, y1 - h),
-				]), col)
-			x += rng.randf_range(34.0, 60.0)
-
-	func _chain(x: float, length: float) -> void:
-		var sway := sin(t * 0.7 + x * 0.05) * 9.0
-		var pts := PackedVector2Array()
-		var steps := 12
-		for i in range(steps + 1):
-			var f := float(i) / steps
-			pts.append(Vector2(x + sway * f * f, -324.0 + length * f))
-		draw_polyline(pts, Color("03060c"), 5.0)
-		for i in range(1, steps):
-			if i % 3 == 0:
-				draw_circle(pts[i], 3.0, Color("080e1a"))
-
-
 # --------------------------------------------------------------- vignette ---
 
 func _build_vignette() -> void:
 	var layer := CanvasLayer.new()
+	layer.name = "VignetteLayer"
 	layer.layer = 4 # above the world, below the HUD (layer 5)
 	add_child(layer)
 	var rect := TextureRect.new()

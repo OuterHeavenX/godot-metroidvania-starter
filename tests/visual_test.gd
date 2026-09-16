@@ -55,13 +55,20 @@ func _process(_delta: float) -> void:
 			if ch is PointLight2D:
 				lantern = true
 		check(lantern, "player lantern light attached")
+		# This used to assert the opposite -- that a Foreground silhouette hung
+		# under the Camera2D. That was the bug: a node parented to the camera
+		# holds its screen position while the world scrolls past, so its grass
+		# and hanging chains appeared to rise with the player on every jump,
+		# reported twice. Diffuse emitters stay, because they drift on their own
+		# velocity and never read as a fixed image. See tests/parallax_test.gd.
 		var cam := player.get_node_or_null("Camera2D")
-		var fg := false
+		var pinned_shapes: Array[String] = []
 		if cam != null:
 			for ch in cam.get_children():
-				if ch.name == "Foreground":
-					fg = true
-		check(fg, "Foreground silhouettes under Camera2D")
+				if ch is CanvasItem and not (ch is CPUParticles2D or ch is GPUParticles2D):
+					pinned_shapes.append(String(ch.name))
+		check(pinned_shapes.is_empty(),
+			"nothing shape-drawing is pinned to the camera, found %s" % str(pinned_shapes))
 		# dash ghosts: call the spawner directly and watch a fading sprite appear
 		var visual := player.get_node_or_null("Visual")
 		if visual != null and visual.has_method("_spawn_ghost"):
