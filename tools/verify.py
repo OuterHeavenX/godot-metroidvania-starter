@@ -43,8 +43,16 @@ for scene in scenes:
             result = subprocess.run([args.engine, "--headless", "--path", str(root), "--scene", "res://" + scene.relative_to(root).as_posix()], capture_output=True, text=True, timeout=240, env=env)
             output = result.stdout + result.stderr
             good = result.returncode == 0 and ("PASSED" in output or "SCRIPT CHECK OK:" in output) and not any(token in output for token in ["FAIL:", "FAILURES", "SCRIPT ERROR:", "Parse Error", "  FAIL "])
-        except subprocess.TimeoutExpired:
-            output, good = "TIMEOUT", False
+        except subprocess.TimeoutExpired as expired:
+            # Keep whatever the suite managed to print. Throwing it away turned
+            # a hang into the single word TIMEOUT, which says nothing about
+            # whether it stalled on the first assertion or after the last one.
+            partial = (expired.stdout or "") + (expired.stderr or "")
+            if isinstance(partial, bytes):
+                partial = partial.decode("utf-8", "replace")
+            output = "TIMEOUT after %ss. Output up to that point:\n%s" % (
+                expired.timeout, partial or "(the suite printed nothing at all)")
+            good = False
         (logs / (scene.stem + ".log")).write_text(output)
         print(scene.stem, "PASS" if good else "FAIL", flush=True)
         if not good:

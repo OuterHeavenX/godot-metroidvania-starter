@@ -1,10 +1,28 @@
 extends Node
 
 var failures := 0
+## Updated as the test walks, so a stall names the step it stalled on instead
+## of timing out silently. It hung once in CI and could not be reproduced in
+## three attempts locally, including from a fresh checkout of the same commit.
+var phase := "start"
+var watchdog := 0.0
 const LEVEL := "res://src/levels/level_01.tscn"
 ## The cemetery no longer holds a boss, so the encounter assertions that need
 ## one run against the arena fixture instead of level one.
 const BOSS_LEVEL := "res://tests/fixtures/warden_arena.tscn"
+
+func _process(delta: float) -> void:
+	watchdog += delta
+	if watchdog > 90.0:
+		print("FAIL: stalled for 90s during: ", phase)
+		print("ARCHITECTURE TESTS: stalled")
+		get_tree().quit(1)
+
+
+func at(step: String) -> void:
+	phase = step
+	watchdog = 0.0
+
 
 func check(ok: bool, message: String) -> void:
 	print(("PASS: " if ok else "FAIL: ") + message)
@@ -58,6 +76,7 @@ func run() -> void:
 	check("double_jump" in SaveMan.abilities, "corrupt primary file recovers the previous snapshot")
 	SaveMan.clear_progress()
 
+	at("building level one")
 	var level: MVLevel = load(LEVEL).instantiate()
 	add_child(level)
 	await get_tree().physics_frame
@@ -89,6 +108,7 @@ func run() -> void:
 	await get_tree().physics_frame
 	check(SaveMan.snapshot.contains(level.data.area_id, slab_id) and SaveMan.snapshot.contains(level.data.area_id, heart_id) and SaveMan.snapshot.contains(level.data.area_id, enemy_id), "world events persist floor, reward and defeated enemy IDs")
 	# Real death path, including its delay and encounter reset.
+	at("the death and respawn path")
 	player.kill()
 	await get_tree().create_timer(1.1, true, false, true).timeout
 	check(not player.dead and player.hp == player.MAX_HP and player.global_position == point, "death returns a healed player to the checkpoint")
@@ -102,6 +122,7 @@ func run() -> void:
 		if spawn.persistence_id == heart_id:
 			spawn.position += Vector2(123, -45)
 			check(SaveMan.snapshot.contains(moved.area_id, spawn.persistence_id), "moving and reordering authored content retains its saved identity")
+	at("flushing the save")
 	SaveMan.flush()
 	remove_child(level)
 	level.queue_free()
@@ -138,6 +159,7 @@ func run() -> void:
 	remove_child(level)
 	level.queue_free()
 	await get_tree().process_frame
+	at("the boss persistence pass")
 	await _boss_persistence()
 	if failures == 0:
 		print("ARCHITECTURE TESTS ALL PASSED")
@@ -147,6 +169,9 @@ func run() -> void:
 ## Guard reset on death, and a defeated boss staying defeated across a reload.
 ## Same assertions as before, moved to a level that still has a Warden in it.
 func _boss_persistence() -> void:
+	at("boss arena: building")
+	# A paused tree never emits physics_frame, which would hang the awaits below.
+	get_tree().paused = false
 	SaveMan.clear_progress()
 	var level: MVLevel = load(BOSS_LEVEL).instantiate()
 	add_child(level)
