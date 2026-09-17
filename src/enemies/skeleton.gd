@@ -23,6 +23,16 @@ const CFG := {
 	"charger": {"speed": 80.0, "hp": 2, "melee_range": 64.0, "attack_cd": 2.4,
 		"patrol": true, "dmg": 1, "charge_range": 280.0, "charge_speed": 330.0},
 }
+## How long a melee swing telegraphs before it lands, and how long the enemy is
+## committed afterwards. The wind-up used to be 0.247s -- about fifteen frames,
+## which is human reaction time, so the tell was over before you could act on
+## it. It is now long enough to see and answer.
+const MELEE_WINDUP := 0.45
+const MELEE_RECOVER := 0.30
+## An enemy that has just noticed you squares up before it swings. Without this
+## the cooldown is zero on first contact, so walking into range was an instant
+## hit with no way to trade first.
+const NOTICE_DELAY := 0.35
 const CHARGE_WINDUP := 0.45
 const CHARGE_TIME := 0.55
 const CHARGE_RECOVER := 0.85
@@ -42,6 +52,8 @@ var state := "patrol"
 var state_t := 0.0
 var cd_t := 0.0
 var struck := false
+var alert_t := 0.0
+var had_target := false
 var knock_v := 0.0
 var visual_scale := 1.0
 
@@ -78,6 +90,7 @@ func _physics_process(delta: float) -> void:
 	combat.tick(delta)
 	hit_flash = maxf(hit_flash - delta, 0.0)
 	cd_t = maxf(cd_t - delta, 0.0)
+	alert_t = maxf(alert_t - delta, 0.0)
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	else:
@@ -94,8 +107,9 @@ func _physics_process(delta: float) -> void:
 		"attack":
 			velocity.x = 0.0
 			state_t -= delta
-			var total: float = 0.55
-			if not struck and state_t < total * 0.55:
+			# state_t counts down from WINDUP + RECOVER, so the blow lands once
+			# the wind-up has elapsed and only the recovery is left.
+			if not struck and state_t <= MELEE_RECOVER:
 				struck = true
 				_melee_strike()
 			if state_t <= 0.0:
@@ -177,16 +191,30 @@ func _patrol(delta: float, player: Node2D) -> void:
 		feedback.emit(&"animation", {"name": "protect"})
 		feedback.emit(&"windup", {})
 	else:
-		if absf(to_p.x) < float(cfg["melee_range"]) and absf(to_p.y) < 70.0:
-			dir = signf(to_p.x)
-			if dir == 0.0:
-				dir = 1.0
-			sensors.scale.x = dir
-			state = "attack"
-			state_t = 0.55
-			struck = false
-			feedback.emit(&"animation", {"name": "attack1"})
-			feedback.emit(&"attack", {})
+		var in_range: bool = absf(to_p.x) < float(cfg["melee_range"]) \
+			and absf(to_p.y) < 70.0
+		if not in_range:
+			had_target = false
+			return
+		if not had_target:
+			# Just noticed you: square up rather than swinging on the same frame
+			# you stepped into reach.
+			had_target = true
+			alert_t = NOTICE_DELAY
+			feedback.emit(&"animation", {"name": "protect"})
+			feedback.emit(&"windup", {})
+			return
+		if alert_t > 0.0:
+			return
+		dir = signf(to_p.x)
+		if dir == 0.0:
+			dir = 1.0
+		sensors.scale.x = dir
+		state = "attack"
+		state_t = MELEE_WINDUP + MELEE_RECOVER
+		struck = false
+		feedback.emit(&"animation", {"name": "attack1"})
+		feedback.emit(&"attack", {})
 
 
 func _melee_strike() -> void:
