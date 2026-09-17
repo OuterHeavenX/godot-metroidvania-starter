@@ -47,7 +47,15 @@ func _draw() -> void:
 	draw_colored_polygon(PackedVector2Array( [
 		Vector2(0, -14), Vector2(9, 0), Vector2(0, 4),
 	]), Color(1, 1, 1, 0.85))
-	if ability_id == "ground_pound":
+	if ability_id == "dagger":
+
+		# A blade pointing right, so the orb reads as what it grants.
+		var c := Color(1, 1, 1, 0.9)
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(10, 0), Vector2(0, -3), Vector2(-4, -2), Vector2(-4, 2), Vector2(0, 3),
+		]), c)
+		draw_rect(Rect2(-9, -1.5, 5, 3), Color(0.35, 0.25, 0.2, 0.95))
+	elif ability_id == "ground_pound":
 
 		var c := Color(1, 1, 1, 0.9)
 		draw_line(Vector2(-8, -7), Vector2(0, 1), c, 3.0)

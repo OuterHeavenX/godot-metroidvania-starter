@@ -8,6 +8,7 @@ func _ready() -> void:
 	_bind($Dash, "dash")
 	_bind($Jump, "jump")
 	_bind($Pound, "pound")
+	_bind($Throw, "throw")
 
 
 func _bind(btn: BaseButton, action: String) -> void:

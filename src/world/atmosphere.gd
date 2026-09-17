@@ -26,7 +26,7 @@ static func build_background(level: Node2D) -> void:
 
 
 static func build_v11(level: Node2D, player: Node2D, orbs: Array,
-		torch_spots: Array, terrain_rects: Array) -> Node2D:
+		torch_spots: Array, terrain_rects: Array, grassy: bool = true) -> Node2D:
 	## v11: MVBackdrop paints the themed parallax background, so this builds
 	## everything else — dark ambient, lights, torch posts, grass, god rays,
 	## camera particles, foreground and vignette.
@@ -38,10 +38,11 @@ static func build_v11(level: Node2D, player: Node2D, orbs: Array,
 	atmo._build_camera_fx(player)
 	atmo._build_vignette()
 	atmo._build_god_rays()
-	var grass := PlatformGrass.new()
-	grass.name = "PlatformGrass"
-	grass.setup(terrain_rects)
-	level.add_child(grass)
+	if grassy:
+		var grass := PlatformGrass.new()
+		grass.name = "PlatformGrass"
+		grass.setup(terrain_rects)
+		level.add_child(grass)
 	var birds := Birds.new()
 	birds.name = "Birds"
 	level.add_child(birds)
@@ -73,17 +74,18 @@ static func build_v11(level: Node2D, player: Node2D, orbs: Array,
 
 
 static func build_lighting(level: Node2D, player: Node2D, orbs: Array,
-		torch_spots: Array, terrain_rects: Array) -> Node2D:
+		torch_spots: Array, terrain_rects: Array, grassy: bool = true) -> Node2D:
 	var atmo = level.get_node("Atmosphere")
 	atmo._build_ambient(level)
 	atmo._build_lights(player, orbs, torch_spots)
 	atmo._build_camera_fx(player)
 	atmo._build_vignette()
 	atmo._build_god_rays()
-	var grass := PlatformGrass.new()
-	grass.name = "PlatformGrass"
-	grass.setup(terrain_rects)
-	level.add_child(grass)
+	if grassy:
+		var grass := PlatformGrass.new()
+		grass.name = "PlatformGrass"
+		grass.setup(terrain_rects)
+		level.add_child(grass)
 	var birds := Birds.new()
 	birds.name = "Birds"
 	atmo.get_node("Parallax/ForestLayer").add_child(birds)

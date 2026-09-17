@@ -2,7 +2,7 @@ class_name MVRunSnapshot
 extends RefCounted
 
 const VERSION := 2
-const ABILITIES := ["double_jump", "ground_pound"]
+const ABILITIES := ["double_jump", "ground_pound", "dagger"]
 var abilities: Array[String] = []
 var checkpoint := Vector2.ZERO
 var has_checkpoint := false

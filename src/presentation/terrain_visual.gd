@@ -6,7 +6,8 @@ var theme := "cemetery"
 func _draw() -> void:
 	for r in rects:
 		var rect: Rect2 = r
-		if theme == "castle":
+		# Ramparts are cut stone like the castle; only the cemetery is earth.
+		if theme == "castle" or theme == "ramparts":
 			_castle_slab(rect)
 		else:
 			_graveyard_earth(rect)

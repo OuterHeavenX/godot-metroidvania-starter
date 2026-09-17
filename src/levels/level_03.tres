@@ -1,0 +1,151 @@
+[gd_resource type="Resource" script_class="MVLevelData" format=3]
+
+[ext_resource type="Script" path="res://src/levels/data/enemy_spawn.gd" id="enemy"]
+[ext_resource type="Script" path="res://src/levels/data/hint.gd" id="hint"]
+[ext_resource type="Script" path="res://src/levels/data/orb_spawn.gd" id="orb"]
+[ext_resource type="Script" path="res://src/levels/data/level_data.gd" id="data"]
+[ext_resource type="Script" path="res://src/levels/data/world_spawn.gd" id="world_spawn"]
+
+[sub_resource type="Resource" id="armoury_enemy_00"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_00"
+position = Vector2(1180, -40)
+kind = "shielder"
+
+[sub_resource type="Resource" id="armoury_enemy_01"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_01"
+position = Vector2(2180, -200)
+kind = "archer"
+
+[sub_resource type="Resource" id="armoury_enemy_02"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_02"
+position = Vector2(2900, -40)
+kind = "charger"
+
+[sub_resource type="Resource" id="armoury_enemy_03"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_03"
+position = Vector2(3520, -160)
+kind = "archer"
+
+[sub_resource type="Resource" id="armoury_enemy_04"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_04"
+position = Vector2(4120, -280)
+kind = "shielder"
+
+[sub_resource type="Resource" id="armoury_enemy_05"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_05"
+position = Vector2(4900, -40)
+kind = "charger"
+
+[sub_resource type="Resource" id="armoury_enemy_06"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_06"
+position = Vector2(5520, -140)
+kind = "archer"
+
+[sub_resource type="Resource" id="armoury_enemy_07"]
+script = ExtResource("enemy")
+persistence_id = "armoury_enemy_07"
+position = Vector2(6120, -240)
+kind = "shielder"
+
+[sub_resource type="Resource" id="armoury_heart_00"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_heart_00"
+position = Vector2(1600, -140)
+
+[sub_resource type="Resource" id="armoury_heart_01"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_heart_01"
+position = Vector2(3560, -190)
+
+[sub_resource type="Resource" id="armoury_heart_02"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_heart_02"
+position = Vector2(5560, -170)
+
+[sub_resource type="Resource" id="armoury_heart_03"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_heart_03"
+position = Vector2(6700, -270)
+
+[sub_resource type="Resource" id="armoury_check_00"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_check_00"
+position = Vector2(980, -70)
+
+[sub_resource type="Resource" id="armoury_check_01"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_check_01"
+position = Vector2(2800, -70)
+
+[sub_resource type="Resource" id="armoury_check_02"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_check_02"
+position = Vector2(4700, -70)
+
+[sub_resource type="Resource" id="armoury_check_03"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_check_03"
+position = Vector2(6100, -270)
+
+[sub_resource type="Resource" id="armoury_orb_00"]
+script = ExtResource("orb")
+persistence_id = "armoury_orb_00"
+position = Vector2(980, -150)
+ability_id = "dagger"
+tint = Color(0.788, 0.831, 0.909, 1)
+
+[sub_resource type="Resource" id="armoury_crack_00"]
+script = ExtResource("world_spawn")
+persistence_id = "armoury_crack_00"
+position = Vector2(4760, 0)
+size = Vector2(150, 30)
+
+[sub_resource type="Resource" id="armoury_hint_00"]
+script = ExtResource("hint")
+text = "THE ARMOURY"
+position = Vector2(120, -250)
+
+[sub_resource type="Resource" id="armoury_hint_01"]
+script = ExtResource("hint")
+text = "DAGGERS: press K\nor tap THROW"
+position = Vector2(860, -250)
+
+[sub_resource type="Resource" id="armoury_hint_02"]
+script = ExtResource("hint")
+text = "Too far to reach —\nthrow instead"
+position = Vector2(1980, -330)
+
+[sub_resource type="Resource" id="armoury_hint_03"]
+script = ExtResource("hint")
+text = "Cracked flagstones —\npound them"
+position = Vector2(4640, -150)
+
+[sub_resource type="Resource" id="armoury_hint_04"]
+script = ExtResource("hint")
+text = "The way up is ahead"
+position = Vector2(6300, -350)
+
+[resource]
+script = ExtResource("data")
+area_id = "armoury"
+level_name = "The Armoury"
+next_level = "res://src/levels/level_04.tscn"
+platforms = Array[Rect2]([Rect2(0, 0, 620, 260), Rect2(860, 0, 360, 260), Rect2(1480, -70, 300, 260), Rect2(2080, -160, 280, 200), Rect2(2660, 0, 560, 260), Rect2(3420, -120, 300, 200), Rect2(4020, -240, 280, 200), Rect2(4560, 0, 620, 260), Rect2(5420, -100, 300, 260), Rect2(6020, -200, 300, 200), Rect2(6560, -200, 560, 200), Rect2(3180, -420, 60, 300), Rect2(4380, -540, 60, 320)])
+breakables = Array[ExtResource("world_spawn")]([SubResource("armoury_crack_00")])
+player_start = Vector2(140, -120)
+enemies = Array[ExtResource("enemy")]([SubResource("armoury_enemy_00"), SubResource("armoury_enemy_01"), SubResource("armoury_enemy_02"), SubResource("armoury_enemy_03"), SubResource("armoury_enemy_04"), SubResource("armoury_enemy_05"), SubResource("armoury_enemy_06"), SubResource("armoury_enemy_07")])
+orbs = Array[ExtResource("orb")]([SubResource("armoury_orb_00")])
+checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("armoury_check_00"), SubResource("armoury_check_01"), SubResource("armoury_check_02"), SubResource("armoury_check_03")])
+heart_spawns = Array[ExtResource("world_spawn")]([SubResource("armoury_heart_00"), SubResource("armoury_heart_01"), SubResource("armoury_heart_02"), SubResource("armoury_heart_03")])
+goal_position = Vector2(6900, -260)
+camera_limits = Rect2(-40, -760, 7300, 1200)
+theme = "castle"
+hints = Array[ExtResource("hint")]([SubResource("armoury_hint_00"), SubResource("armoury_hint_01"), SubResource("armoury_hint_02"), SubResource("armoury_hint_03"), SubResource("armoury_hint_04")])
+background_span = Vector2(-600, 7400)

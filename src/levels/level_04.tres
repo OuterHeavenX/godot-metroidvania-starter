@@ -1,0 +1,154 @@
+[gd_resource type="Resource" script_class="MVLevelData" format=3]
+
+[ext_resource type="Script" path="res://src/levels/data/enemy_spawn.gd" id="enemy"]
+[ext_resource type="Script" path="res://src/levels/data/hint.gd" id="hint"]
+[ext_resource type="Script" path="res://src/levels/data/orb_spawn.gd" id="orb"]
+[ext_resource type="Script" path="res://src/levels/data/level_data.gd" id="data"]
+[ext_resource type="Script" path="res://src/levels/data/world_spawn.gd" id="world_spawn"]
+
+[sub_resource type="Resource" id="ramparts_enemy_00"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_00"
+position = Vector2(1100, -120)
+kind = "archer"
+
+[sub_resource type="Resource" id="ramparts_enemy_01"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_01"
+position = Vector2(1600, -120)
+kind = "charger"
+
+[sub_resource type="Resource" id="ramparts_enemy_02"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_02"
+position = Vector2(2200, -240)
+kind = "shielder"
+
+[sub_resource type="Resource" id="ramparts_enemy_03"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_03"
+position = Vector2(2800, -240)
+kind = "archer"
+
+[sub_resource type="Resource" id="ramparts_enemy_04"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_04"
+position = Vector2(3500, -100)
+kind = "charger"
+
+[sub_resource type="Resource" id="ramparts_enemy_05"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_05"
+position = Vector2(4120, -220)
+kind = "archer"
+
+[sub_resource type="Resource" id="ramparts_enemy_06"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_06"
+position = Vector2(4700, -340)
+kind = "shielder"
+
+[sub_resource type="Resource" id="ramparts_enemy_07"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_07"
+position = Vector2(5280, -340)
+kind = "charger"
+
+[sub_resource type="Resource" id="ramparts_enemy_08"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_08"
+position = Vector2(5960, -200)
+kind = "archer"
+
+[sub_resource type="Resource" id="ramparts_enemy_09"]
+script = ExtResource("enemy")
+persistence_id = "ramparts_enemy_09"
+position = Vector2(6600, -200)
+kind = "shielder"
+
+[sub_resource type="Resource" id="ramparts_heart_00"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_heart_00"
+position = Vector2(1540, -160)
+
+[sub_resource type="Resource" id="ramparts_heart_01"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_heart_01"
+position = Vector2(3420, -140)
+
+[sub_resource type="Resource" id="ramparts_heart_02"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_heart_02"
+position = Vector2(4680, -380)
+
+[sub_resource type="Resource" id="ramparts_heart_03"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_heart_03"
+position = Vector2(6700, -240)
+
+[sub_resource type="Resource" id="ramparts_check_00"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_check_00"
+position = Vector2(900, -150)
+
+[sub_resource type="Resource" id="ramparts_check_01"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_check_01"
+position = Vector2(2740, -270)
+
+[sub_resource type="Resource" id="ramparts_check_02"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_check_02"
+position = Vector2(4660, -370)
+
+[sub_resource type="Resource" id="ramparts_check_03"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_check_03"
+position = Vector2(5900, -230)
+
+[sub_resource type="Resource" id="ramparts_crack_00"]
+script = ExtResource("world_spawn")
+persistence_id = "ramparts_crack_00"
+position = Vector2(3480, -60)
+size = Vector2(150, 30)
+
+[sub_resource type="Resource" id="ramparts_hint_00"]
+script = ExtResource("hint")
+text = "THE RAMPARTS"
+position = Vector2(120, -260)
+
+[sub_resource type="Resource" id="ramparts_hint_01"]
+script = ExtResource("hint")
+text = "The last stretch —\neverything you have"
+position = Vector2(700, -230)
+
+[sub_resource type="Resource" id="ramparts_hint_02"]
+script = ExtResource("hint")
+text = "Archers: close the gap\nor throw"
+position = Vector2(2100, -420)
+
+[sub_resource type="Resource" id="ramparts_hint_03"]
+script = ExtResource("hint")
+text = "Cracked stone underfoot"
+position = Vector2(3380, -200)
+
+[sub_resource type="Resource" id="ramparts_hint_04"]
+script = ExtResource("hint")
+text = "The gate is ahead"
+position = Vector2(6200, -380)
+
+[resource]
+script = ExtResource("data")
+area_id = "ramparts"
+level_name = "The Ramparts"
+platforms = Array[Rect2]([Rect2(0, 0, 560, 300), Rect2(820, -80, 320, 300), Rect2(1460, -80, 300, 300), Rect2(2060, -200, 280, 300), Rect2(2660, -200, 320, 300), Rect2(3300, -60, 420, 300), Rect2(4000, -180, 280, 300), Rect2(4580, -300, 280, 300), Rect2(5160, -300, 340, 300), Rect2(5820, -160, 380, 300), Rect2(6480, -160, 620, 300), Rect2(2400, -520, 60, 300), Rect2(4900, -640, 60, 320)])
+breakables = Array[ExtResource("world_spawn")]([SubResource("ramparts_crack_00")])
+player_start = Vector2(120, -120)
+enemies = Array[ExtResource("enemy")]([SubResource("ramparts_enemy_00"), SubResource("ramparts_enemy_01"), SubResource("ramparts_enemy_02"), SubResource("ramparts_enemy_03"), SubResource("ramparts_enemy_04"), SubResource("ramparts_enemy_05"), SubResource("ramparts_enemy_06"), SubResource("ramparts_enemy_07"), SubResource("ramparts_enemy_08"), SubResource("ramparts_enemy_09")])
+checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("ramparts_check_00"), SubResource("ramparts_check_01"), SubResource("ramparts_check_02"), SubResource("ramparts_check_03")])
+heart_spawns = Array[ExtResource("world_spawn")]([SubResource("ramparts_heart_00"), SubResource("ramparts_heart_01"), SubResource("ramparts_heart_02"), SubResource("ramparts_heart_03")])
+goal_position = Vector2(6900, -220)
+camera_limits = Rect2(-40, -860, 7200, 1300)
+theme = "ramparts"
+hints = Array[ExtResource("hint")]([SubResource("ramparts_hint_00"), SubResource("ramparts_hint_01"), SubResource("ramparts_hint_02"), SubResource("ramparts_hint_03"), SubResource("ramparts_hint_04")])
+background_span = Vector2(-600, 7300)

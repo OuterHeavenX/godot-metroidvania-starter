@@ -13,6 +13,9 @@ func _on_feedback(event: StringName, details: Dictionary) -> void:
 	var pos := player.global_position
 	match event:
 		&"attack": AudioMan.play("attack", -2.0, randf_range(0.95, 1.08))
+		# Reuses the swing sample pitched up: a thrown blade is a lighter, faster
+		# version of the same sound, and the asset set has no separate throw.
+		&"throw": AudioMan.play("attack", -6.0, randf_range(1.3, 1.45))
 		&"jump", &"double_jump": AudioMan.play(String(event))
 		&"dash":
 			AudioMan.play("dash")

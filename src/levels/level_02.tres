@@ -103,6 +103,7 @@ position = Vector2(2560, 60)
 script = ExtResource("4_ushmp")
 area_id = "castle_hall"
 level_name = "The Castle Hall"
+next_level = "res://src/levels/level_03.tscn"
 platforms = Array[Rect2]([Rect2(0, 0, 620, 200), Rect2(840, 60, 360, 200), Rect2(1400, 120, 420, 160), Rect2(1960, 120, 340, 160), Rect2(1780, 280, 220, 40), Rect2(2500, 120, 680, 160), Rect2(2840, -240, 70, 270), Rect2(3110, -240, 70, 360), Rect2(3250, -300, 300, 60)])
 breakables = Array[ExtResource("world_spawn")]([SubResource("cracked_01")])
 

@@ -5,6 +5,7 @@ extends CanvasLayer
 @onready var dash_chip: Label = $TopLeft / Chips / DashChip
 @onready var dj_chip: Label = $TopLeft / Chips / DoubleJumpChip
 @onready var pound_chip: Label = $TopLeft / Chips / PoundChip
+@onready var dagger_chip: Label = $TopLeft / Chips / DaggerChip
 @onready var win_panel: CenterContainer = $Overlay / WinPanel
 @onready var pause_panel: CenterContainer = $Overlay / PausePanel
 @onready var mute_button: Button = $MuteButton
@@ -147,6 +148,8 @@ func on_ability_gained(ability_id: String) -> void:
 		dj_chip.add_theme_color_override("font_color", Color("6ee7ff"))
 	elif ability_id == "ground_pound":
 		pound_chip.add_theme_color_override("font_color", Color("ff9a3c"))
+	elif ability_id == "dagger":
+		dagger_chip.add_theme_color_override("font_color", Color("c9d4e8"))
 
 
 func show_win(seconds: float = 0.0, previous_best: float = 0.0) -> void:

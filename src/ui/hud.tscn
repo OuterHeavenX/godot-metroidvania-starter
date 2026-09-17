@@ -42,6 +42,12 @@ theme_override_colors/font_color = Color(0.35, 0.38, 0.48, 1)
 theme_override_font_sizes/font_size = 18
 text = "POUND"
 
+[node name="DaggerChip" type="Label" parent="TopLeft/Chips" unique_id=1669499990]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.38, 0.48, 1)
+theme_override_font_sizes/font_size = 18
+text = "DAGGER"
+
 [node name="Hint" type="Label" parent="." unique_id=1434906535]
 anchors_preset = 7
 anchor_left = 0.5
@@ -54,7 +60,7 @@ offset_right = 420.0
 offset_bottom = -10.0
 theme_override_colors/font_color = Color(1, 1, 1, 0.45)
 theme_override_font_sizes/font_size = 15
-text = "A/D or arrows: move · Space: jump · Shift: dash · S/↓: pound · Esc: pause · Stomp enemies · Find the orbs"
+text = "A/D or arrows: move · Space: jump · Shift: dash · S/↓: pound · K: throw · Esc: pause · Stomp enemies · Find the orbs"
 horizontal_alignment = 1
 
 [node name="Build" type="Label" parent="." unique_id=1275702021]

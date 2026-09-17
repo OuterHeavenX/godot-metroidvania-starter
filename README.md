@@ -34,7 +34,9 @@ src/                     All game code, one folder per feature
   levels/
     level.gd             Generic builder: turns an MVLevelData into an area
     level_01.tscn/.tres  Area one: the opening run and the Undercroft
-    level_02.tscn/.tres  Area two: the Sunken Works
+    level_02.tscn/.tres  Area two: the Castle Hall
+    level_03.tscn/.tres  Area three: the Armoury, where the daggers are
+    level_04.tscn/.tres  Area four: the Ramparts, and the end of the run
     data/
       level_data.gd      MVLevelData: terrain, actors, bounds, dressing
       enemy_spawn.gd     MVEnemySpawn: position + kind
@@ -72,6 +74,12 @@ tests/
   save_test.gd           Progress written and restored across a reload
   title_test.gd          Continue and stats appear only with progress
   boss_test.gd           Guard, pound-to-break, phase two, goal unlock
+  dagger_test.gd         Gate, cooldown, travel and impact, driven through the
+                         throw input rather than by calling it directly
+  levels_test.gd         Builds every shipped area: validates ids, measures the
+                         hardest hop against the jump simulator, and checks
+                         nothing is left floating over a pit
+  parallax_test.gd       Every layer's drift measured against world space
   bossfight_test.gd      The fight with real cooldowns; teleports into position,
                          so regression evidence only
   bossfair_test.gd       The same fight using nothing but key presses
@@ -282,7 +290,9 @@ remember the node ids, see above.
 | Area | Contents |
 | ---- | -------- |
 | `level_01` | Opening run, wall-jump shaft, both ability orbs, the Undercroft, the Warden |
-| `level_02` | The Sunken Works: shielders, chargers, a cracked floor with a cache below, and a wall-jump climb out |
+| `level_02` | The Castle Hall: shielders, chargers, a cracked floor with a cache below, and a wall-jump climb out |
+| `level_03` | The Armoury: the dagger orb, then archers placed across gaps the sword cannot cross |
+| `level_04` | The Ramparts: the last stretch, over the town, using everything |
 
 Area two assumes both abilities, because you arrive with them.
 

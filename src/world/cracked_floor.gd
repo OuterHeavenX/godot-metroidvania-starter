@@ -38,9 +38,9 @@ func break_floor() -> void:
 func _draw() -> void:
 	var r := Rect2(-rect.size * 0.5, rect.size)
 
-	var body := Color("3c4463") if theme == "castle" else Color("4a3d2c")
-	var lip := Color("5b689a") if theme == "castle" else Color("6b5a40")
-	var edge := Color("10131f") if theme == "castle" else Color("141008")
+	var body := Color("3c4463") if theme != "cemetery" else Color("4a3d2c")
+	var lip := Color("5b689a") if theme != "cemetery" else Color("6b5a40")
+	var edge := Color("10131f") if theme != "cemetery" else Color("141008")
 	draw_rect(r, body)
 	draw_rect(Rect2(r.position, Vector2(r.size.x, 5)), lip)
 	draw_rect(r, edge, false, 2.5)

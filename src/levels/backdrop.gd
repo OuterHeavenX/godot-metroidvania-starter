@@ -8,7 +8,7 @@ extends RefCounted
 ## Everything is drawn with primitives: no art needed beyond what the project
 ## already ships, and it scales to any level width.
 
-const THEMES := ["cemetery", "castle"]
+const THEMES := ["cemetery", "castle", "ramparts"]
 
 
 static func build(host: Node2D, theme: String, span: Vector2) -> void:
@@ -46,6 +46,10 @@ static func _sky(theme: String) -> Control:
 	if theme == "castle":
 		grad.set_color(0, Color("07090f"))
 		grad.set_color(1, Color("161b2c"))
+	elif theme == "ramparts":
+		# Open sky: lighter at the horizon than either interior.
+		grad.set_color(0, Color("060a16"))
+		grad.set_color(1, Color("27304d"))
 	else:
 		grad.set_color(0, Color("05070f"))
 		grad.set_color(1, Color("1a2138"))
@@ -68,6 +72,14 @@ static func _layers(theme: String) -> Array:
 			{"scale": 0.18, "y": -40.0, "painter": CastleDepth.new()},
 			{"scale": 0.38, "y": 0.0, "painter": CastleWall.new()},
 			{"scale": 0.62, "y": 0.0, "painter": CastleColumns.new()},
+		]
+	if theme == "ramparts":
+		return [
+			{"scale": 0.14, "y": -70.0, "painter": RampartSky.new()},
+			{"scale": 0.32, "y": 0.0, "painter": TownBelow.new()},
+			# Raised so the merlons sit behind the player rather than under the
+			# platforms they walk on, where nothing of them showed.
+			{"scale": 0.58, "y": -250.0, "painter": Battlements.new()},
 		]
 	return [
 		{"scale": 0.16, "y": -60.0, "painter": CemeteryRidge.new()},
@@ -370,3 +382,91 @@ class CastleColumns extends Node2D:
 		]), cloth)
 		draw_circle(Vector2(x, top + h * 0.42), 15.0, gold)
 		draw_circle(Vector2(x, top + h * 0.42), 10.0, cloth)
+
+
+# ---------------------------------------------------------------- ramparts --
+
+class RampartSky extends Node2D:
+	## Stars, a low moon and the far hills beyond the walls.
+	var span := Vector2(-400, 4400)
+
+	func _draw() -> void:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 515
+		for i in range(150):
+			var p := Vector2(rng.randf_range(span.x, span.y), rng.randf_range(-640.0, -80.0))
+			draw_circle(p, rng.randf_range(0.8, 2.3), Color(1, 1, 1, rng.randf_range(0.2, 0.8)))
+		var moon := Vector2(span.x + (span.y - span.x) * 0.3, -430.0)
+		draw_circle(moon, 62.0, Color(0.93, 0.95, 1.0, 0.13))
+		draw_circle(moon, 42.0, Color(0.95, 0.96, 1.0, 0.9))
+		draw_circle(moon + Vector2(16, -9), 34.0, Color("27304d"))
+		# far hills
+		var pts := PackedVector2Array([Vector2(span.x, 200.0)])
+		var x := span.x
+		while x < span.y:
+			pts.append(Vector2(x, -90.0 - sin(x * 0.0021) * 55.0 - rng.randf_range(0.0, 26.0)))
+			x += 90.0
+		pts.append(Vector2(span.y, 200.0))
+		draw_colored_polygon(pts, Color("141b30"))
+
+
+class TownBelow extends Node2D:
+	## The town under the walls: rooftops and lit windows, seen from above.
+	var span := Vector2(-400, 4400)
+
+	func _draw() -> void:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 909
+		var x := span.x
+		while x < span.y:
+			var w := rng.randf_range(46.0, 104.0)
+			var h := rng.randf_range(70.0, 190.0)
+			var top := -20.0 - h
+			draw_rect(Rect2(x, top, w, h + 240.0), Color("1a2238"))
+			# roof
+			draw_colored_polygon(PackedVector2Array([
+				Vector2(x - 7, top), Vector2(x + w * 0.5, top - rng.randf_range(18.0, 40.0)),
+				Vector2(x + w + 7, top),
+			]), Color("222b45"))
+			var wy := top + 22.0
+			while wy < top + h - 16.0:
+				var wx := x + 10.0
+				while wx < x + w - 14.0:
+					if rng.randf() < 0.45:
+						draw_rect(Rect2(wx, wy, 7, 9), Color(1.0, 0.82, 0.45, 0.5))
+					wx += 18.0
+				wy += 26.0
+			x += w + rng.randf_range(10.0, 34.0)
+
+
+class Battlements extends Node2D:
+	## The near parapet: merlons along the top, with braziers between them.
+	var span := Vector2(-400, 4400)
+
+	func _draw() -> void:
+		var stone := Color("2a3350")
+		var dark := Color("1d2540")
+		draw_rect(Rect2(span.x, 30.0, span.y - span.x, 90.0), stone)
+		draw_rect(Rect2(span.x, 30.0, span.y - span.x, 10.0), Color("3a456b"))
+		var x := span.x
+		var i := 0
+		while x < span.y:
+			# merlon
+			draw_rect(Rect2(x, -46.0, 54.0, 76.0), stone)
+			draw_rect(Rect2(x, -46.0, 54.0, 8.0), Color("3a456b"))
+			draw_line(Vector2(x + 27, -38), Vector2(x + 27, 24), dark, 2.0)
+			if i % 3 == 1:
+				_brazier(x + 84.0)
+			x += 96.0
+			i += 1
+
+	func _brazier(x: float) -> void:
+		var iron := Color("222a44")
+		draw_rect(Rect2(x - 3, -30, 6, 34), iron)
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(x - 17, -50), Vector2(x + 17, -50),
+			Vector2(x + 10, -28), Vector2(x - 10, -28),
+		]), iron)
+		draw_circle(Vector2(x, -56), 15.0, Color(1.0, 0.55, 0.22, 0.20))
+		draw_circle(Vector2(x, -58), 9.0, Color(1.0, 0.72, 0.34, 0.55))
+		draw_circle(Vector2(x, -60), 5.0, Color(1.0, 0.9, 0.6, 0.85))

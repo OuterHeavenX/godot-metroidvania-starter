@@ -61,6 +61,8 @@ const APEX_SPEED := 90.0
 const APEX_GRAVITY_MULT := 0.72
 const MAX_FALL_SPEED := 1150.0
 const ATTACK_BACK_GRACE := 14.0
+## Slower than the sword's 0.38 so range costs something.
+const THROW_COOLDOWN := 0.55
 const DASH_IFRAMES := true
 # The camera's drag margin makes it trail the player, which shows where you
 # have been rather than where you are going. Leading by roughly the same
@@ -74,6 +76,8 @@ var hp: int:
 	set(value): combat.hp = value
 var has_double_jump := false
 var has_ground_pound := false
+var has_dagger := false
+var throw_cd := 0.0
 var pounding: bool:
 	get: return action_state in [Action.POUND_WINDUP, Action.POUND_FALL]
 	set(value):
@@ -167,6 +171,8 @@ func gain_ability(ability_id: String) -> void:
 		has_double_jump = true
 	elif ability_id == "ground_pound":
 		has_ground_pound = true
+	elif ability_id == "dagger":
+		has_dagger = true
 	ability_gained.emit(ability_id)
 
 
@@ -222,6 +228,7 @@ func _physics_process(delta: float) -> void:
 	dash_cd = maxf(dash_cd - delta, 0.0)
 	combat.tick(delta)
 	hurt_t = maxf(hurt_t - delta, 0.0)
+	throw_cd = maxf(throw_cd - delta, 0.0)
 	melee.tick(delta)
 
 	if Input.is_action_just_pressed("jump"):
@@ -245,6 +252,10 @@ func _physics_process(delta: float) -> void:
 		facing = dash_dir
 		feedback.emit(&"dash", {})
 
+
+	if Input.is_action_just_pressed("throw") and has_dagger and throw_cd <= 0.0 \
+			and action_state in [Action.NORMAL, Action.DASH]:
+		_throw_dagger()
 
 	if Input.is_action_just_pressed("attack"):
 		melee.request()
@@ -326,6 +337,16 @@ func _gravity_now() -> float:
 	if absf(velocity.y) < APEX_SPEED:
 		g *= APEX_GRAVITY_MULT
 	return g
+
+
+## Thrown from the hand, in the direction faced. Deliberately slower to repeat
+## than the sword: at range you trade damage rate for not being in reach.
+func _throw_dagger() -> void:
+	throw_cd = THROW_COOLDOWN
+	var blade := MVDagger.new()
+	blade.setup(facing, global_position + Vector2(facing * 22.0, -18.0))
+	get_parent().add_child(blade)
+	feedback.emit(&"throw", {})
 
 
 func _pound_impact() -> void:

@@ -5,5 +5,5 @@ extends Resource
 
 @export var persistence_id := ""
 @export var position := Vector2.ZERO
-@export_enum("double_jump", "ground_pound") var ability_id := "double_jump"
+@export_enum("double_jump", "ground_pound", "dagger") var ability_id := "double_jump"
 @export var tint := Color("6ee7ff")
