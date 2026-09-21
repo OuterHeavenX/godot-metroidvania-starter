@@ -94,3 +94,9 @@ Expected malformed-file diagnostics are deliberately produced by the corruption 
 ### Verified result
 
 Godot 4.7.2: **18/18 suites passed**, including script compilation. The native arena render completed without runtime errors. Two successive web exports matched byte-for-byte; the exported files were copied to `docs/`. `build/.gdignore` prevents generated builds and diagnostic sources from being imported into the project. Changes are local to `codex/gameplay-improvements`; no publishing or Pages configuration changes were performed.
+
+## Campaign records and transient reset
+
+Current best times and clear counts use `records/four_areas_v1`. Change the record section when campaign length or scoring rules change. Unversioned `stats` remain archived because their campaign length cannot be determined. Progress and audio settings migrate independently.
+
+Encounter retries detach and free every node in the `projectile` group beneath the owning level before spawning survivors. New projectile types must join that group. Player respawn resets the throw cooldown alongside other action timers. The title derives its ability total from `MVRunSnapshot.ABILITIES`.

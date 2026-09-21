@@ -4,6 +4,9 @@ extends Node
 ## for the mute flag -- both load before they save, so neither clobbers the
 ## other's section.
 
+## Change this key when campaign length or scoring rules change.
+const RECORD_SECTION := "records/four_areas_v1"
+
 const PATH := "user://metroidvania_starter.cfg"
 
 var snapshot := MVRunSnapshot.new()
@@ -61,8 +64,8 @@ func load_progress() -> void:
 		push_warning("Save version is newer than this game; progress will not be overwritten.")
 		return
 	snapshot = MVRunSnapshot.read(cfg)
-	best_time = MVRunSnapshot.nonnegative(cfg.get_value("stats", "best_time", 0.0))
-	runs = int(MVRunSnapshot.nonnegative(cfg.get_value("stats", "runs", 0)))
+	best_time = MVRunSnapshot.nonnegative(cfg.get_value(RECORD_SECTION, "best_time", 0.0))
+	runs = int(MVRunSnapshot.nonnegative(cfg.get_value(RECORD_SECTION, "runs", 0)))
 	_dirty = false
 
 
@@ -74,9 +77,11 @@ func save_progress() -> void:
 		cfg.load(PATH + ".bak") # Keep settings when recovering a corrupt primary.
 	if _pending_mute != null:
 		cfg.set_value("audio", "muted", _pending_mute)
+	# Unversioned stats remain archived in their original section. Their
+	# campaign length is unknown, so never compare them with current runs.
 	snapshot.write(cfg)
-	cfg.set_value("stats", "best_time", best_time)
-	cfg.set_value("stats", "runs", runs)
+	cfg.set_value(RECORD_SECTION, "best_time", best_time)
+	cfg.set_value(RECORD_SECTION, "runs", runs)
 	var error := cfg.save(PATH + ".tmp")
 	if error == OK:
 		if FileAccess.file_exists(PATH):

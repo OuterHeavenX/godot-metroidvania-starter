@@ -25,7 +25,7 @@ func _enter_tree() -> void:
 		SaveMan.best_time = 0.0
 		SaveMan.runs = 0
 	else:
-		SaveMan.abilities = ["double_jump"]
+		SaveMan.abilities = ["double_jump", "ground_pound", "dagger"]
 		SaveMan.has_checkpoint = true
 		SaveMan.checkpoint = Vector2(1780, -70)
 		SaveMan.best_time = 91.25
@@ -51,6 +51,7 @@ func _process(_delta: float) -> void:
 		get_tree().reload_current_scene()
 		return # The replacement scene owns the next test phase.
 	else:
+		check("3/3 abilities" in stats.text, "all three abilities have a matching total")
 		check(cont.visible, "continue shown when progress exists")
 		check("1:31.25" in stats.text, "best time shown, got %s" % stats.text)
 		check("2 clears" in stats.text, "clear count shown, got %s" % stats.text)

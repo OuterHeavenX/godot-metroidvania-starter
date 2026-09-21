@@ -56,8 +56,9 @@ func reset_survivors() -> void:
 			remove_child(foe)
 			foe.queue_free()
 	enemies.clear()
-	for child in get_children():
-		if child is MVArrow:
-			remove_child(child)
-			child.queue_free()
+	for projectile in get_tree().get_nodes_in_group("projectile"):
+		# Player and enemy projectiles have different parents, but share a level.
+		if get_parent().is_ancestor_of(projectile):
+			projectile.get_parent().remove_child(projectile)
+			projectile.queue_free()
 	_spawn_enemies()

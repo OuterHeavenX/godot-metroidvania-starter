@@ -418,6 +418,7 @@ func respawn() -> void:
 	jumps_used = 0
 	dash_timer = 0.0
 	dash_cd = 0.0
+	throw_cd = 0.0
 	pounding = false
 	pound_t = 0.0
 	hurt_t = 0.0

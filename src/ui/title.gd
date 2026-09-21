@@ -45,7 +45,7 @@ func _stats_line() -> String:
 	if SaveMan.runs > 0:
 		bits.append("%d clear%s" % [SaveMan.runs, "" if SaveMan.runs == 1 else "s"])
 	if SaveMan.has_run() and not SaveMan.abilities.is_empty():
-		bits.append("%d/2 abilities" % SaveMan.abilities.size())
+		bits.append("%d/%d abilities" % [SaveMan.abilities.size(), MVRunSnapshot.ABILITIES.size()])
 	return "   ·   ".join(bits)
 
 
