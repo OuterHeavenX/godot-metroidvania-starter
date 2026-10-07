@@ -1,0 +1,66 @@
+name: Build and Upload to itch.io
+
+on:
+  push:
+    branches: [ main, master, claude/happy-darwin-6dadcx ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        lfs: true
+
+    - name: Download Godot 4.7.2
+      run: |
+        wget https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+        unzip Godot_v4.7.2-stable_linux.x86_64.zip
+        chmod +x Godot_v4.7.2-stable_linux.x86_64/Godot_v4.7.2-stable_linux.x86_64
+        ln -s Godot_v4.7.2-stable_linux.x86_64/Godot_v4.7.2-stable_linux.x86_64 godot
+
+    - name: Import resources
+      run: |
+        ./godot --headless --import .
+
+    - name: Build Linux export
+      run: |
+        mkdir -p build/itch/linux
+        ./godot --headless --export-release "Linux" "build/itch/linux/metroidvania"
+        chmod +x build/itch/linux/metroidvania
+
+    - name: Build Web export
+      run: |
+        mkdir -p build/itch/web
+        ./godot --headless --export-release "Web" "build/itch/web/index.html"
+
+    - name: Download butler
+      run: |
+        wget https://broth.itch.ovh/butler/linux-amd64/LATEST/butler
+        chmod +x butler
+
+    - name: Upload to itch.io
+      env:
+        ITCH_TOKEN: ${{ secrets.ITCH_TOKEN }}
+      run: |
+        if [ -z "$ITCH_TOKEN" ]; then
+          echo "❌ ITCH_TOKEN secret not set!"
+          exit 1
+        fi
+
+        echo "📤 Uploading to itch.io..."
+
+        if [ -d "build/itch/linux" ]; then
+          echo "🐧 Uploading Linux build..."
+          ./butler push build/itch/linux outerheavenx/winter-warrior:linux --userversion=$(git describe --tags --always)
+        fi
+
+        if [ -d "build/itch/web" ]; then
+          echo "🌐 Uploading Web build..."
+          ./butler push build/itch/web outerheavenx/winter-warrior:web --userversion=$(git describe --tags --always)
+        fi
+
+        echo "✨ Upload complete!"
