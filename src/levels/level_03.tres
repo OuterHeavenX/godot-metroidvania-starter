@@ -146,6 +146,6 @@ checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("armoury_chec
 heart_spawns = Array[ExtResource("world_spawn")]([SubResource("armoury_heart_00"), SubResource("armoury_heart_01"), SubResource("armoury_heart_02"), SubResource("armoury_heart_03")])
 goal_position = Vector2(6900, -260)
 camera_limits = Rect2(-40, -760, 7300, 1200)
-theme = "castle"
+theme = "winter"
 hints = Array[ExtResource("hint")]([SubResource("armoury_hint_00"), SubResource("armoury_hint_01"), SubResource("armoury_hint_02"), SubResource("armoury_hint_03"), SubResource("armoury_hint_04")])
 background_span = Vector2(-600, 7400)

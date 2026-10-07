@@ -6,8 +6,9 @@ var theme := "cemetery"
 func _draw() -> void:
 	for r in rects:
 		var rect: Rect2 = r
-		# Ramparts are cut stone like the castle; only the cemetery is earth.
-		if theme == "castle" or theme == "ramparts":
+		if theme == "winter":
+			_winter_snow(rect)
+		elif theme == "castle" or theme == "ramparts":
 			_castle_slab(rect)
 		else:
 			_graveyard_earth(rect)
@@ -53,4 +54,31 @@ func _graveyard_earth(rect: Rect2) -> void:
 			Vector2(gx + rng.randf_range(-3.0, 3.0), rect.position.y - h),
 			Color("3c5b3f"), 2.0)
 		gx += rng.randf_range(9.0, 22.0)
+	draw_rect(rect, Color("0d1120"), false, 2.0)
+
+## Snowy/icy frozen ground with drifts and icicles
+func _winter_snow(rect: Rect2) -> void:
+	# Base ice layer
+	draw_rect(rect, Color("d4e4f7"))
+	# Darker ice streaks
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(absf(rect.position.x) * 7.0 + absf(rect.position.y) * 13.0) + 1
+	# Random cracks and frozen patterns
+	for i in range(int(rect.size.x / 40.0) + 1):
+		var x := rect.position.x + rng.randf_range(0.0, rect.size.x)
+		var y := rect.position.y + rng.randf_range(0.0, 8.0)
+		draw_line(Vector2(x, y), Vector2(x + rng.randf_range(8.0, 24.0), y + rng.randf_range(-2.0, 2.0)),
+			Color("a8c5e0"), 1.5)
+	# Snow drifts on top
+	draw_rect(Rect2(rect.position, Vector2(rect.size.x, 8)), Color("e8f2ff"))
+	draw_rect(Rect2(rect.position + Vector2(0, 8), Vector2(rect.size.x, 2)),
+		Color("c0d8f0"))
+	# Icicles hanging from the edge
+	var ix := rect.position.x + 6.0
+	while ix < rect.end.x - 6.0:
+		var icicle_h := rng.randf_range(6.0, 14.0)
+		draw_line(Vector2(ix, rect.position.y),
+			Vector2(ix + rng.randf_range(-1.0, 1.0), rect.position.y - icicle_h),
+			Color("b8dff7"), 1.0)
+		ix += rng.randf_range(12.0, 28.0)
 	draw_rect(rect, Color("0d1120"), false, 2.0)

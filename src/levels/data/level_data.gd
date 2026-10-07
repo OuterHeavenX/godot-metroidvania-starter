@@ -55,8 +55,8 @@ var hearts: Array[Vector2]:
 @export var kill_y := 500.0
 
 @export_group("Dressing")
-## Picks the backdrop and how terrain is painted: "cemetery" or "castle".
-@export_enum("cemetery", "castle", "ramparts") var theme := "cemetery"
+## Picks the backdrop and how terrain is painted: "cemetery", "castle", "ramparts", or "winter".
+@export_enum("cemetery", "castle", "ramparts", "winter") var theme := "cemetery"
 @export var hints: Array[MVHint] = []
 ## Horizontal span of the world the backdrop has to cover. Each parallax
 ## layer scales this by its own motion scale to decide how wide to paint.

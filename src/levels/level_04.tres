@@ -149,6 +149,6 @@ checkpoint_spawns = Array[ExtResource("world_spawn")]([SubResource("ramparts_che
 heart_spawns = Array[ExtResource("world_spawn")]([SubResource("ramparts_heart_00"), SubResource("ramparts_heart_01"), SubResource("ramparts_heart_02"), SubResource("ramparts_heart_03")])
 goal_position = Vector2(6900, -220)
 camera_limits = Rect2(-40, -860, 7200, 1300)
-theme = "ramparts"
+theme = "winter"
 hints = Array[ExtResource("hint")]([SubResource("ramparts_hint_00"), SubResource("ramparts_hint_01"), SubResource("ramparts_hint_02"), SubResource("ramparts_hint_03"), SubResource("ramparts_hint_04")])
 background_span = Vector2(-600, 7300)

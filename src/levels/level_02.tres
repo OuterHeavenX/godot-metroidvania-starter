@@ -115,6 +115,6 @@ heart_spawns = Array[ExtResource("world_spawn")]([SubResource("hearts_01"), SubR
 
 goal_position = Vector2(3400, -360)
 camera_limits = Rect2(-40, -560, 3660, 1100)
-theme = "castle"
+theme = "winter"
 hints = Array[ExtResource("2_uypy2")]([SubResource("Resource_bj8xr"), SubResource("Resource_uypy2"), SubResource("Resource_p3sh5"), SubResource("Resource_ushmp"), SubResource("Resource_gk3a0")])
 background_span = Vector2(-600, 4200)
