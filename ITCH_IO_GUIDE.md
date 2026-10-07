@@ -29,7 +29,7 @@ godot --headless --import .
 
 # Build Linux export (recommended for Steam Deck)
 mkdir -p build/itch/linux
-godot --headless --export-release "Linux" "build/itch/linux/metroidvania"
+godot --headless --export-release "Linux" "build/itch/linux/winter-warrior"
 
 # Or build web export
 mkdir -p build/itch/web
@@ -63,7 +63,7 @@ godot --headless --export-release "Web" "build/itch/web/index.html"
 
 For the **Linux** build:
 1. After uploading, find the upload in the list
-2. Set the launch target to: `metroidvania` (the executable)
+2. Set the launch target to: `winter-warrior` (the executable)
 
 For the **Web** build:
 1. Upload `build/itch/web/` as an HTML upload

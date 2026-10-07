@@ -36,8 +36,10 @@ jobs:
     - name: Build Linux export
       run: |
         mkdir -p build/itch/linux
-        ./godot --headless --export-release "Linux" "build/itch/linux/metroidvania"
-        chmod +x build/itch/linux/metroidvania
+        ./godot --headless --export-release "Linux" "build/itch/linux/winter-warrior"
+        chmod +x build/itch/linux/winter-warrior
+        printf '[[actions]]\nname = "play"\npath = "winter-warrior"\n' > build/itch/linux/.itch.toml
+        ls -la build/itch/linux
 
     - name: Build Web export
       run: |

@@ -23,8 +23,8 @@ echo "📦 Importing resources..."
 # Build Linux export (for Steam Deck)
 echo "🐧 Building Linux export..."
 mkdir -p "$OUTPUT_DIR/linux"
-"$GODOT" --headless --export-release "Linux" "$OUTPUT_DIR/linux/metroidvania"
-chmod +x "$OUTPUT_DIR/linux/metroidvania"
+"$GODOT" --headless --export-release "Linux" "$OUTPUT_DIR/linux/winter-warrior"
+chmod +x "$OUTPUT_DIR/linux/winter-warrior"
 echo "✓ Linux export complete: $OUTPUT_DIR/linux/"
 
 # Build web export
@@ -41,11 +41,11 @@ cat > "$OUTPUT_DIR/linux/itch_metadata.json" <<'EOF'
   "description": "A tight 2D metroidvania: run, coyote-time jumps, wall-jump shaft, dash, and a double-jump ability gate. Battle through the frozen peaks!",
   "kind": "game",
   "platforms": {
-    "linux": "metroidvania"
+    "linux": "winter-warrior"
   },
   "launch_targets": {
     "linux": {
-      "script": "metroidvania",
+      "script": "winter-warrior",
       "primary": true
     }
   }
