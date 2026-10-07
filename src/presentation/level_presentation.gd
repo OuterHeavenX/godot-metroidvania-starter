@@ -21,6 +21,6 @@ static func dress(level: Node2D, data: MVLevelData, player: MVPlayer, orbs: Arra
 	if data.has_boss:
 		torches.append(data.boss_position)
 	# Grass only where grass grows. It was sprouting from the castle's flagstones
-	# and the ramparts' cut stone, which undercuts both.
+	# and the ramparts' cut stone, which undercuts both. Winter keeps it, frosted.
 	MVAtmosphere.build_v11(level, player, orbs, torches, data.platforms,
-		data.theme == "cemetery")
+		data.theme in ["cemetery", "winter"], data.theme == "winter")

@@ -26,7 +26,8 @@ static func build_background(level: Node2D) -> void:
 
 
 static func build_v11(level: Node2D, player: Node2D, orbs: Array,
-		torch_spots: Array, terrain_rects: Array, grassy: bool = true) -> Node2D:
+		torch_spots: Array, terrain_rects: Array, grassy: bool = true,
+		frosted: bool = false) -> Node2D:
 	## v11: MVBackdrop paints the themed parallax background, so this builds
 	## everything else — dark ambient, lights, torch posts, grass, god rays,
 	## camera particles, foreground and vignette.
@@ -41,7 +42,7 @@ static func build_v11(level: Node2D, player: Node2D, orbs: Array,
 	if grassy:
 		var grass := PlatformGrass.new()
 		grass.name = "PlatformGrass"
-		grass.setup(terrain_rects)
+		grass.setup(terrain_rects, frosted)
 		level.add_child(grass)
 	var birds := Birds.new()
 	birds.name = "Birds"
@@ -74,7 +75,8 @@ static func build_v11(level: Node2D, player: Node2D, orbs: Array,
 
 
 static func build_lighting(level: Node2D, player: Node2D, orbs: Array,
-		torch_spots: Array, terrain_rects: Array, grassy: bool = true) -> Node2D:
+		torch_spots: Array, terrain_rects: Array, grassy: bool = true,
+		frosted: bool = false) -> Node2D:
 	var atmo = level.get_node("Atmosphere")
 	atmo._build_ambient(level)
 	atmo._build_lights(player, orbs, torch_spots)
@@ -84,7 +86,7 @@ static func build_lighting(level: Node2D, player: Node2D, orbs: Array,
 	if grassy:
 		var grass := PlatformGrass.new()
 		grass.name = "PlatformGrass"
-		grass.setup(terrain_rects)
+		grass.setup(terrain_rects, frosted)
 		level.add_child(grass)
 	var birds := Birds.new()
 	birds.name = "Birds"
@@ -469,7 +471,7 @@ class PlatformGrass extends Node2D:
 	var t := 0.0
 	var _tufts: Array = []
 
-	func setup(rects: Array) -> void:
+	func setup(rects: Array, frosted: bool = false) -> void:
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 20260714
 		for entry in rects:
@@ -482,7 +484,8 @@ class PlatformGrass extends Node2D:
 						"y": rc.position.y,
 						"h": rng.randf_range(10.0, 20.0),
 						"ph": rng.randf_range(0.0, 6.28),
-						"c": Color(0.16 + rng.randf() * 0.08, 0.32 + rng.randf() * 0.1, 0.18),
+						"c": (Color(0.74 + rng.randf() * 0.1, 0.80 + rng.randf() * 0.08, 0.90) if frosted
+							else Color(0.16 + rng.randf() * 0.08, 0.32 + rng.randf() * 0.1, 0.18)),
 					})
 				x += rng.randf_range(16.0, 34.0)
 
