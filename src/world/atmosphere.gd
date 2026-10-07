@@ -125,11 +125,11 @@ static func _build_sky_layer(atmo: MVAtmosphere) -> void:
 	layer.name = "SkyLayer"
 	layer.layer = -100
 	atmo.add_child(layer)
-	# vertical night gradient
+	# vertical winter night gradient - cooler icy blues and purples
 	var grad := Gradient.new()
-	grad.set_color(0, Color("03060e"))
-	grad.set_color(1, Color("0e1828"))
-	grad.add_point(0.55, Color("081120"))
+	grad.set_color(0, Color("050a18"))  # deeper blue-black at top
+	grad.set_color(1, Color("1a2a40"))  # icy blue-grey at bottom
+	grad.add_point(0.55, Color("0d1a2e"))  # middle: cold blue
 	var gtex := GradientTexture2D.new()
 	gtex.gradient = grad
 	gtex.width = 4
@@ -155,15 +155,15 @@ class SkyDraw extends Node2D:
 	func _draw() -> void:
 		# positioned relative to the real viewport so any window/aspect works
 		var size := get_viewport_rect().size
-		# pale moon with halo, upper right
+		# pale, icy moon with cold halo, upper right
 		var m := Vector2(size.x * 0.78, size.y * 0.12)
 		var mr := size.y * 0.10
-		draw_circle(m, mr * 2.1, Color(0.85, 0.9, 1.0, 0.05))
-		draw_circle(m, mr * 1.5, Color(0.85, 0.9, 1.0, 0.07))
-		draw_circle(m, mr, Color("dfe6f5"))
-		draw_circle(m + Vector2(-mr * 0.3, -mr * 0.24), mr * 0.17, Color("c3cde2"))
-		draw_circle(m + Vector2(mr * 0.27, mr * 0.2), mr * 0.12, Color("c9d2e6"))
-		draw_circle(m + Vector2(mr * 0.07, -mr * 0.4), mr * 0.09, Color("ccd5e8"))
+		draw_circle(m, mr * 2.1, Color(0.6, 0.75, 1.0, 0.08))
+		draw_circle(m, mr * 1.5, Color(0.7, 0.8, 1.0, 0.12))
+		draw_circle(m, mr, Color("e8f0ff"))
+		draw_circle(m + Vector2(-mr * 0.3, -mr * 0.24), mr * 0.17, Color("d0dff5"))
+		draw_circle(m + Vector2(mr * 0.27, mr * 0.2), mr * 0.12, Color("d8e8f5"))
+		draw_circle(m + Vector2(mr * 0.07, -mr * 0.4), mr * 0.09, Color("e0f0ff"))
 		# twinkling stars across the top two thirds
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 4242
@@ -292,7 +292,9 @@ class Ruins extends Node2D:
 		var i := 0
 		while i < 13:
 			var x := -700.0 + i * 400.0 + rng.randf_range(-70.0, 70.0)
-			if rng.randf() < 0.3:
+			if rng.randf() < 0.25:
+				_torii_gate(x, ground, rng)
+			elif rng.randf() < 0.4:
 				_arch(x, ground, rng)
 			else:
 				_pillar(x, ground, rng.randf_range(90.0, 230.0),
@@ -333,6 +335,27 @@ class Ruins extends Node2D:
 		var col := Color("121a2e")
 		draw_rect(Rect2(x - w * 0.5 - 20, ground - h, w + 40, 22), col)
 		draw_rect(Rect2(x - w * 0.5 - 20, ground - h, w + 40, 5), Color("22304f"))
+
+	func _torii_gate(x: float, ground: float, rng: RandomNumberGenerator) -> void:
+		# Japanese shrine gate (torii) - minimalist design fitting the snowy aesthetic
+		var col := Color("1a2840")  # dark blue-grey wood
+		var accent := Color("2a3860")  # slightly lighter for details
+		var pillar_w := 16.0
+		var pillar_h := rng.randf_range(140.0, 200.0)
+		# two vertical pillars
+		draw_rect(Rect2(x - 60, ground - pillar_h, pillar_w, pillar_h), col)
+		draw_rect(Rect2(x + 44, ground - pillar_h, pillar_w, pillar_h), col)
+		# top beam (horizontal crossbeam slightly angled for perspective)
+		draw_colored_polygon(PackedVector2Array([
+			Vector2(x - 58, ground - pillar_h + 12),
+			Vector2(x + 60, ground - pillar_h + 8),
+			Vector2(x + 60, ground - pillar_h + 22),
+			Vector2(x - 58, ground - pillar_h + 26),
+		]), col)
+		# middle horizontal beam
+		draw_rect(Rect2(x - 55, ground - pillar_h * 0.4, 118, 10), col)
+		# accent rim on top beam
+		draw_line(Vector2(x - 58, ground - pillar_h + 12), Vector2(x + 60, ground - pillar_h + 8), accent, 2.0)
 
 
 class FogBand extends Node2D:
@@ -641,60 +664,60 @@ func _build_camera_fx(player: Node2D) -> void:
 	var cam := player.get_node("Camera2D") as Camera2D
 	if cam == null:
 		return
-	# embers rising through the air
-	var embers := CPUParticles2D.new()
-	embers.amount = 26
-	embers.lifetime = 6.0
-	embers.preprocess = 6.0
-	embers.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	embers.emission_rect_extents = Vector2(576, 324)
-	embers.direction = Vector2(0, -1)
-	embers.spread = 30.0
-	embers.initial_velocity_min = 18.0
-	embers.initial_velocity_max = 55.0
-	embers.gravity = Vector2(0, -12)
-	embers.texture = load("res://assets/particles/dot.png") as Texture2D
-	embers.scale_amount_min = 0.008
-	embers.scale_amount_max = 0.018
-	embers.color = Color(1.0, 0.58, 0.22, 0.75)
-	cam.add_child(embers)
-	embers.emitting = true
-	# slow dust motes drifting sideways
-	var dust := CPUParticles2D.new()
-	dust.amount = 30
-	dust.lifetime = 9.0
-	dust.preprocess = 9.0
-	dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	dust.emission_rect_extents = Vector2(576, 324)
-	dust.direction = Vector2(1, 0)
-	dust.spread = 45.0
-	dust.initial_velocity_min = 8.0
-	dust.initial_velocity_max = 26.0
-	dust.gravity = Vector2.ZERO
-	dust.scale_amount_min = 1.0
-	dust.scale_amount_max = 2.4
-	dust.color = Color(0.75, 0.85, 1.0, 0.28)
-	cam.add_child(dust)
-	dust.emitting = true
-	# dead leaves tumbling down through the moonlight
-	var leaves := CPUParticles2D.new()
-	leaves.amount = 14
-	leaves.lifetime = 11.0
-	leaves.preprocess = 11.0
-	leaves.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	leaves.emission_rect_extents = Vector2(576, 324)
-	leaves.direction = Vector2(0, 1)
-	leaves.spread = 55.0
-	leaves.initial_velocity_min = 22.0
-	leaves.initial_velocity_max = 48.0
-	leaves.gravity = Vector2(0, 26)
-	leaves.angular_velocity_min = -160.0
-	leaves.angular_velocity_max = 160.0
-	leaves.scale_amount_min = 2.2
-	leaves.scale_amount_max = 3.8
-	leaves.color = Color(0.42, 0.46, 0.24, 0.65)
-	cam.add_child(leaves)
-	leaves.emitting = true
+	# heavy snow flurries falling and drifting in the wind
+	var snow := CPUParticles2D.new()
+	snow.amount = 85
+	snow.lifetime = 14.0
+	snow.preprocess = 14.0
+	snow.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	snow.emission_rect_extents = Vector2(640, 400)
+	snow.direction = Vector2(0, 1)
+	snow.spread = 35.0
+	snow.initial_velocity_min = 12.0
+	snow.initial_velocity_max = 38.0
+	snow.gravity = Vector2(18.0, 8.0)  # wind + slight gravity
+	snow.texture = load("res://assets/particles/dot.png") as Texture2D
+	snow.scale_amount_min = 0.012
+	snow.scale_amount_max = 0.028
+	snow.color = Color(0.92, 0.94, 1.0, 0.7)
+	cam.add_child(snow)
+	snow.emitting = true
+	# wind-driven snow wisps (larger, slower drifting)
+	var wind_snow := CPUParticles2D.new()
+	wind_snow.amount = 40
+	wind_snow.lifetime = 18.0
+	wind_snow.preprocess = 18.0
+	wind_snow.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	wind_snow.emission_rect_extents = Vector2(640, 500)
+	wind_snow.direction = Vector2(1, 0.5)
+	wind_snow.spread = 25.0
+	wind_snow.initial_velocity_min = 6.0
+	wind_snow.initial_velocity_max = 22.0
+	wind_snow.gravity = Vector2(12.0, 4.0)  # strong wind, light gravity
+	wind_snow.texture = load("res://assets/particles/smoke.png") as Texture2D
+	wind_snow.scale_amount_min = 0.8
+	wind_snow.scale_amount_max = 1.6
+	wind_snow.color = Color(0.88, 0.90, 0.98, 0.35)
+	cam.add_child(wind_snow)
+	wind_snow.emitting = true
+	# distant ice crystals catching moonlight (rare sparkles)
+	var ice_crystals := CPUParticles2D.new()
+	ice_crystals.amount = 12
+	ice_crystals.lifetime = 8.0
+	ice_crystals.preprocess = 8.0
+	ice_crystals.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	ice_crystals.emission_rect_extents = Vector2(576, 324)
+	ice_crystals.direction = Vector2(0, 1)
+	ice_crystals.spread = 70.0
+	ice_crystals.initial_velocity_min = 8.0
+	ice_crystals.initial_velocity_max = 28.0
+	ice_crystals.gravity = Vector2(0, 12)
+	ice_crystals.texture = load("res://assets/particles/magic.png") as Texture2D
+	ice_crystals.scale_amount_min = 0.6
+	ice_crystals.scale_amount_max = 1.2
+	ice_crystals.color = Color(0.6, 0.8, 1.0, 0.5)
+	cam.add_child(ice_crystals)
+	ice_crystals.emitting = true
 
 
 # --------------------------------------------------------------- vignette ---
