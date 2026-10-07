@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build Metroidvania Starter for itch.io distribution
+# Build Winter Warrior for itch.io distribution
 # Supports Steam Deck (Linux) and web exports
 
 set -euo pipefail
@@ -7,7 +7,7 @@ set -euo pipefail
 GODOT="${GODOT:-godot}"
 OUTPUT_DIR="${OUTPUT_DIR:-build/itch}"
 
-echo "🎮 Building Metroidvania Starter for itch.io"
+echo "🎮 Building Winter Warrior for itch.io"
 echo "  Godot: $GODOT"
 echo "  Output: $OUTPUT_DIR"
 echo ""
@@ -37,8 +37,8 @@ echo "✓ Web export complete: $OUTPUT_DIR/web/"
 echo "📝 Creating itch.io metadata..."
 cat > "$OUTPUT_DIR/linux/itch_metadata.json" <<'EOF'
 {
-  "name": "Metroidvania Starter",
-  "description": "A tight 2D metroidvania starter: run, coyote-time jumps, wall-jump shaft, dash, and a double-jump ability gate.",
+  "name": "Winter Warrior",
+  "description": "A tight 2D metroidvania: run, coyote-time jumps, wall-jump shaft, dash, and a double-jump ability gate. Battle through the frozen peaks!",
   "kind": "game",
   "platforms": {
     "linux": "metroidvania"
@@ -53,7 +53,7 @@ cat > "$OUTPUT_DIR/linux/itch_metadata.json" <<'EOF'
 EOF
 
 cat > "$OUTPUT_DIR/web/README.md" <<'EOF'
-# Metroidvania Starter - Web Version
+# Winter Warrior - Web Version
 
 Open `index.html` in a web browser to play.
 

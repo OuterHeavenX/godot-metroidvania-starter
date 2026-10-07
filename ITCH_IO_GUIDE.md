@@ -43,9 +43,9 @@ godot --headless --export-release "Web" "build/itch/web/index.html"
 1. Go to https://itch.io/dashboard
 2. Click "Create new project"
 3. Fill in:
-   - **Title**: Metroidvania Starter
-   - **Project URL**: Choose something like `metroidvania-starter-test` (for testing)
-   - **Description**: A tight 2D metroidvania starter: run, coyote-time jumps, wall-jump shaft, dash, and a double-jump ability gate.
+   - **Title**: Winter Warrior
+   - **Project URL**: `winter-warrior`
+   - **Description**: A tight 2D metroidvania: run, coyote-time jumps, wall-jump shaft, dash, and a double-jump ability gate. Battle through the frozen peaks!
    - **Classification**: Game
    - **Kind of project**: HTML / Game Jam / etc.
 

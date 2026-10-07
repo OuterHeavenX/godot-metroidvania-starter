@@ -1,16 +1,16 @@
 #!/bin/bash
-# Upload Metroidvania Starter to itch.io
+# Upload Winter Warrior to itch.io
 # Requires butler (itch.io's command-line tool) and an API token
 
 set -euo pipefail
 
 # Configuration - update these
 ITCH_USER="${ITCH_USER:-}"
-ITCH_GAME="${ITCH_GAME:-metroidvania-starter-test}"
+ITCH_GAME="${ITCH_GAME:-winter-warrior}"
 ITCH_TOKEN="${ITCH_TOKEN:-}"
 BUILD_DIR="build/itch"
 
-echo "🎮 Uploading Metroidvania Starter to itch.io"
+echo "🎮 Uploading Winter Warrior to itch.io"
 echo ""
 
 # Check configuration

@@ -11,7 +11,7 @@ from pathlib import Path
 
 # Configuration
 ITCH_USER = "outerheavenX"
-ITCH_GAME = "metroidvania-starter-test"
+ITCH_GAME = "winter-warrior"
 ITCH_TOKEN = os.environ.get("ITCH_TOKEN", "")
 BUILD_DIR = Path("build/itch")
 

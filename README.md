@@ -1,10 +1,11 @@
-# Metroidvania Starter
+# Winter Warrior
 
 Architecture: [implemented systems and recovery rules](ARCHITECTURE.md).
 Design: [mechanics audit and future proposals](DESIGN_AUDIT.md).
 
-A tight 2D metroidvania starter built in Godot 4.7: run, coyote-time jumps,
+A tight 2D metroidvania built in Godot 4.7: run, coyote-time jumps,
 wall-jump shaft, dash, ground pound, and a double-jump ability gate.
+Battle through the frozen peaks and master the ancient combat techniques!
 
 Play it: https://outerheavenx.github.io/godot-metroidvania-starter/
 
