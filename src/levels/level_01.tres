@@ -83,7 +83,7 @@ position = Vector2(1660, -250)
 [sub_resource type="Resource" id="Resource_qvahq"]
 script = ExtResource("2_sp832")
 text = "GROUND POUND:
-press S / ↓ in midair"
+press {POUND} in midair"
 position = Vector2(2640, -240)
 
 [sub_resource type="Resource" id="Resource_pbfgv"]

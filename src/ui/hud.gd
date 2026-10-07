@@ -14,11 +14,14 @@ extends CanvasLayer
 @onready var restart_button: Button = $Overlay / PausePanel / Panel / VBox / Restart
 @onready var again_button: Button = $Overlay / WinPanel / Panel / VBox / Again
 @onready var title_button: Button = $Overlay / PausePanel / Panel / VBox / Title2
+@onready var sound_button: Button = $Overlay / PausePanel / Panel / VBox / Sound
 @onready var win_time: Label = $Overlay / WinPanel / Panel / VBox / Time
 @onready var key_hint: Label = $Hint
 @onready var win_title: Label = $Overlay / WinPanel / Panel / VBox / Title
 @onready var win_sub: Label = $Overlay / WinPanel / Panel / VBox / Sub
 @onready var build_label: Label = $Build
+
+const LEGEND := "{MOVE}: move · {JUMP}: jump · {DASH}: dash · {POUND}: pound · {THROW}: throw · {PAUSE}: pause · Stomp enemies · Find the orbs"
 
 var boss_bar: VBoxContainer
 var won := false
@@ -38,7 +41,14 @@ func _ready() -> void:
 	restart_button.pressed.connect(restart)
 	again_button.pressed.connect(_on_again)
 	title_button.pressed.connect(quit_to_title)
+	sound_button.pressed.connect(_on_mute_pressed)
+	_refresh_legend()
+	Input.joy_connection_changed.connect(func (_device: int, _connected: bool) -> void: _refresh_legend())
 	apply_touch_layout(DisplayServer.is_touchscreen_available())
+
+
+func _refresh_legend() -> void:
+	key_hint.text = MVInputGlyphs.fmt(LEGEND)
 
 
 ## Phone layout. Taken as an argument rather than read from DisplayServer so a
@@ -74,6 +84,8 @@ func _set_pause(p: bool) -> void:
 		return
 	get_tree().paused = p
 	pause_panel.visible = p
+	if p:
+		resume_button.grab_focus()
 	_show_touch_controls(not p)
 	AudioMan.play("ui_click")
 
@@ -109,6 +121,7 @@ func show_area_cleared(next_level: String, banked: float) -> void:
 	win_time.visible = true
 	again_button.text = "NEXT AREA"
 	win_panel.visible = true
+	again_button.grab_focus()
 	pause_panel.visible = false
 	_show_touch_controls(false)
 	get_tree().paused = true
@@ -137,6 +150,7 @@ func _on_mute_pressed() -> void:
 
 func _refresh_mute_label() -> void:
 	mute_button.text = "SOUND OFF" if AudioMan.is_muted() else "SOUND ON"
+	sound_button.text = mute_button.text
 
 
 func set_hearts(hp: int, max_hp: int) -> void:
@@ -167,6 +181,7 @@ func show_win(seconds: float = 0.0, previous_best: float = 0.0) -> void:
 	else:
 		win_time.visible = false
 	win_panel.visible = true
+	again_button.grab_focus()
 	pause_panel.visible = false
 	_show_touch_controls(false)
 	get_tree().paused = true

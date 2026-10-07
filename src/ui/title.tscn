@@ -76,7 +76,7 @@ offset_right = 420.0
 offset_bottom = -12.0
 theme_override_colors/font_color = Color(1, 1, 1, 0.45)
 theme_override_font_sizes/font_size = 16
-text = "Keyboard: A/D, Space, Shift, S · Gamepad: D-pad, Y, LB, A · Esc: pause"
+text = "A/D or arrows: move · Space: jump · Shift: dash · S / ↓: pound · K: throw · Esc: pause"
 horizontal_alignment = 1
 
 [node name="MuteButton" type="Button" parent="." unique_id=6200010]

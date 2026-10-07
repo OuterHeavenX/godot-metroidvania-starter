@@ -8,7 +8,7 @@ static func dress(level: Node2D, data: MVLevelData, player: MVPlayer, orbs: Arra
 	AudioMan.play_music(data.music)
 	for h in data.hints:
 		var hint := Label.new()
-		hint.text = h.text
+		hint.text = MVInputGlyphs.fmt(h.text)
 		hint.position = h.position
 		hint.add_theme_font_size_override("font_size", 26)
 		hint.add_theme_color_override("font_color", Color("cfe0ff"))

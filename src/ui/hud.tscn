@@ -127,21 +127,24 @@ horizontal_alignment = 1
 [node name="Resume" type="Button" parent="Overlay/PausePanel/Panel/VBox" unique_id=785453205]
 custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
-focus_mode = 0
 theme_override_font_sizes/font_size = 22
 text = "RESUME"
 
 [node name="Restart" type="Button" parent="Overlay/PausePanel/Panel/VBox" unique_id=785453206]
 custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
-focus_mode = 0
 theme_override_font_sizes/font_size = 22
-text = "RESTART RUN"
+text = "RESTART AREA"
+
+[node name="Sound" type="Button" parent="Overlay/PausePanel/Panel/VBox" unique_id=785453210]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "SOUND ON"
 
 [node name="Title2" type="Button" parent="Overlay/PausePanel/Panel/VBox" unique_id=785453208]
 custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
-focus_mode = 0
 theme_override_font_sizes/font_size = 22
 text = "QUIT TO TITLE"
 
@@ -182,6 +185,5 @@ horizontal_alignment = 1
 [node name="Again" type="Button" parent="Overlay/WinPanel/Panel/VBox" unique_id=785453207]
 custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
-focus_mode = 0
 theme_override_font_sizes/font_size = 22
 text = "PLAY AGAIN"

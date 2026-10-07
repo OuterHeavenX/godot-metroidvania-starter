@@ -97,6 +97,9 @@ For the **Web** build:
 - **J or X**: Attack
 - **S or Down Arrow**: Pound
 - **K or C**: Throw
+- **Esc**: Pause
+
+Gamepad / Steam Deck: **D-pad or left stick** move · **Y** jump · **LB** dash · **X** attack · **A** (or D-pad down) pound · **B** throw · **Start** pause. Menus are navigated with the D-pad and **A**.
 
 **Note**: The game is designed for keyboard/gamepad controls. Both work well on Steam Deck.
 

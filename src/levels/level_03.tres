@@ -114,7 +114,7 @@ position = Vector2(120, -250)
 
 [sub_resource type="Resource" id="armoury_hint_01"]
 script = ExtResource("hint")
-text = "DAGGERS: press K\nor tap THROW"
+text = "DAGGERS: press {THROW}\nor tap THROW"
 position = Vector2(860, -250)
 
 [sub_resource type="Resource" id="armoury_hint_02"]
