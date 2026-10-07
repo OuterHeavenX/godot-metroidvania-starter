@@ -3,7 +3,11 @@ extends CanvasLayer
 
 func _ready() -> void:
 	add_to_group("touch_controls")
-	visible = DisplayServer.is_touchscreen_available()
+	# Only show touch controls on actual mobile devices (phones/tablets)
+	# Steam Deck uses gamepad, not touch
+	var is_mobile := OS.get_name() in ["Android", "iOS", "Web"]
+	var has_touchscreen := DisplayServer.is_touchscreen_available()
+	visible = is_mobile and has_touchscreen
 	_bind($Attack, "attack")
 	_bind($Dash, "dash")
 	_bind($Jump, "jump")
